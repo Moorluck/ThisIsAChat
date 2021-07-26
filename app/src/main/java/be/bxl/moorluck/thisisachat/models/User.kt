@@ -1,11 +1,9 @@
 package be.bxl.moorluck.thisisachat.models
 
 data class User(
-    val email : String,
-    val password : String,
-    val pseudo : String,
+    val email : String? = null,
+    val pseudo : String? = null,
     val rooms : List<Room> = listOf(),
-    val imgId : String = "",
-    val lat : Double = 55.5833,
-    val long : Double = -4.3833
+    val imgId : String? = null,
+    val position : Position = Position()
 )

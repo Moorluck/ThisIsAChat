@@ -1,20 +1,33 @@
 package be.bxl.moorluck.thisisachat
 
+import android.content.Intent
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
+import be.bxl.moorluck.thisisachat.models.Position
 import be.bxl.moorluck.thisisachat.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class SignUpActivity : AppCompatActivity() {
 
+    // Const
+
+    companion object {
+        val USER_ID_CODE = "USER_ID_CODE"
+        val USER_EMAIL_CODE = "USER_EMAIL_CODE"
+        val USER_PSEUDO_CODE = "USER_PSEUDO_CODE"
+    }
+
     // Firebase
 
     lateinit var auth : FirebaseAuth
+    lateinit var databaseReference : DatabaseReference
 
     // View
 
@@ -44,6 +57,9 @@ class SignUpActivity : AppCompatActivity() {
         // FireBase
 
         auth = Firebase.auth
+        databaseReference = Firebase
+            .database("https://thisisachat-b0f70-default-rtdb.europe-west1.firebasedatabase.app")
+            .reference
 
         // View
 
@@ -65,29 +81,63 @@ class SignUpActivity : AppCompatActivity() {
         imgProfile = findViewById(R.id.img_profile_signup_activity)
 
         btnSignUp.setOnClickListener {
+            
             val email = etEmail.text.toString()
             val password = etPassword.text.toString()
             val pseudo = etPseudo.text.toString()
 
-            val user = User(email, password, pseudo)
+            if (email.trim() != "" && password.trim() != "" && pseudo.trim() != "") {
+                registerUser(email, password, pseudo)
+            }
+            else {
+                Toast.makeText(this, "You must fill all the fields", Toast.LENGTH_LONG).show()
+            }
 
-            registerUser(user)
         }
     }
 
-    private fun registerUser(user: User) {
-        auth.createUserWithEmailAndPassword(user.email, user.password)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    Toast.makeText(this, "${user.pseudo} is Registered", Toast.LENGTH_LONG).show()
-                }
-                else {
-                    Toast.makeText(this, "Error while signing up", Toast.LENGTH_LONG).show()
-                }
-            }
+    private fun registerUser(email : String, password : String, pseudo : String) {
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { it ->
+                    if (it.isSuccessful) {
+                        val latLong = manageLocalization()
+                        val user = User(email, pseudo, position = latLong)
+
+                        val fireBaseUserId : String = it.result?.user!!.uid
+
+                        databaseReference.child("users").child(fireBaseUserId).setValue(user)
+                            .addOnCompleteListener {
+                                if (it.isSuccessful) {
+                                    Toast.makeText(this, "Sign up !", Toast.LENGTH_LONG).show()
+
+                                    val intent = Intent(this, RoomActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                                else {
+                                    Toast.makeText(this, "Error while updating database", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                            .addOnCanceledListener {
+                                Toast.makeText(this, "Error while signing uupdating database", Toast.LENGTH_LONG).show()
+                            }
+
+
+                    }
+                    else {
+                        Toast.makeText(this, "Error while signing up", Toast.LENGTH_LONG).show()
+                    }
+        }
+
+
 
 
         // uploadImg(imgProfile.drawable as Bitmap)
+    }
+
+    private fun manageLocalization(): Position {
+        //TODO find localization with reverse geocoding
+        return Position()
     }
 
     private fun uploadImg(bitmap: Bitmap) {
