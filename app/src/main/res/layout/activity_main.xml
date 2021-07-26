@@ -4,15 +4,85 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/darkGreen"
     tools:context=".MainActivity">
 
+
+    <EditText
+        android:id="@+id/et_password_main_activity"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/et_shape"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:padding="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/et_e_mail_main_activity"
+        app:layout_constraintStart_toStartOf="@+id/tv_password_main_activity2"
+        app:layout_constraintTop_toBottomOf="@+id/tv_password_main_activity2" />
+
     <TextView
+        android:id="@+id/tv_password_main_activity2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="16dp"
+        android:text="Password"
+        android:textColor="@color/grey"
+        app:layout_constraintStart_toStartOf="@+id/et_e_mail_main_activity"
+        app:layout_constraintTop_toBottomOf="@+id/et_e_mail_main_activity" />
+
+    <TextView
+        android:id="@+id/tv_e_mail_main_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="E-mail"
+        android:textColor="@color/grey"
+        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/tiac" />
+
+    <EditText
+        android:id="@+id/et_e_mail_main_activity"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/et_shape"
+        android:padding="5dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="@+id/tv_e_mail_main_activity"
+        app:layout_constraintTop_toBottomOf="@+id/tv_e_mail_main_activity" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Sign In"
+        android:textColor="@color/lightPurple"
+        app:layout_constraintEnd_toEndOf="@+id/et_password_main_activity"
+        app:layout_constraintTop_toBottomOf="@+id/et_password_main_activity" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Sign Up"
+        android:backgroundTint="@color/darkGreen"
+        android:textColor="@color/lightPurple"
+        app:layout_constraintStart_toStartOf="@+id/et_password_main_activity"
+        app:layout_constraintTop_toBottomOf="@+id/et_password_main_activity" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
