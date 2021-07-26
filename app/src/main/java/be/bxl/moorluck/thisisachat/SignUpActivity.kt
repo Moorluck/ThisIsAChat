@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
 import be.bxl.moorluck.thisisachat.models.Position
+import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -81,7 +82,7 @@ class SignUpActivity : AppCompatActivity() {
         imgProfile = findViewById(R.id.img_profile_signup_activity)
 
         btnSignUp.setOnClickListener {
-            
+
             val email = etEmail.text.toString()
             val password = etPassword.text.toString()
             val pseudo = etPseudo.text.toString()
@@ -97,42 +98,49 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun registerUser(email : String, password : String, pseudo : String) {
-            auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { it ->
-                    if (it.isSuccessful) {
-                        val latLong = manageLocalization()
-                        val user = User(email, pseudo, position = latLong)
 
-                        val fireBaseUserId : String = it.result?.user!!.uid
+        // Signing up user
 
-                        databaseReference.child("users").child(fireBaseUserId).setValue(user)
-                            .addOnCompleteListener {
-                                if (it.isSuccessful) {
-                                    Toast.makeText(this, "Sign up !", Toast.LENGTH_LONG).show()
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { it ->
+                if (it.isSuccessful) {
+                    val latLong : Position = manageLocalization()
+                    val rooms = getInitialRoomByHobbies()
+                    val imgID : String? = uploadImg()
+                    val user = User(email, pseudo, rooms, imgID, latLong)
 
-                                    val intent = Intent(this, RoomActivity::class.java)
-                                    startActivity(intent)
-                                    finish()
-                                }
-                                else {
-                                    Toast.makeText(this, "Error while updating database", Toast.LENGTH_LONG).show()
-                                }
+                    val fireBaseUserId : String = it.result?.user!!.uid
+
+                    // Add user data in real-time database
+                    databaseReference.child("users").child(fireBaseUserId).setValue(user)
+                        .addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                Toast.makeText(this, "Sign up !", Toast.LENGTH_LONG).show()
+
+                                val intent = Intent(this, RoomActivity::class.java)
+                                startActivity(intent)
+                                finish()
                             }
-                            .addOnCanceledListener {
-                                Toast.makeText(this, "Error while signing uupdating database", Toast.LENGTH_LONG).show()
+                            else {
+                                Toast.makeText(this, "Error while updating database", Toast.LENGTH_LONG).show()
                             }
+                        }
+                        .addOnCanceledListener {
+                            Toast.makeText(this, "Error while signing uupdating database", Toast.LENGTH_LONG).show()
+                        }
 
 
-                    }
-                    else {
-                        Toast.makeText(this, "Error while signing up", Toast.LENGTH_LONG).show()
-                    }
+                }
+                else {
+                    Toast.makeText(this, "Error while signing up", Toast.LENGTH_LONG).show()
+                }
         }
-
-
-
-
         // uploadImg(imgProfile.drawable as Bitmap)
+    }
+
+    private fun getInitialRoomByHobbies(): List<Room> {
+        //TODO get room checking the ceckboxes
+        return listOf()
     }
 
     private fun manageLocalization(): Position {
@@ -140,8 +148,8 @@ class SignUpActivity : AppCompatActivity() {
         return Position()
     }
 
-    private fun uploadImg(bitmap: Bitmap) {
-        //TODO upload image to firebase
-        return
+    private fun uploadImg(bitmap: Bitmap? = null) : String? {
+        //TODO upload image to firebase and get the image ID
+        return null
     }
 }
