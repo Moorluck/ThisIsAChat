@@ -1,9 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/darkGreen"
     tools:context=".SignUpActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_signup_signup_activity"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
+            android:text="Sign Up"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cb_sport_signup_activity" />
+
+        <EditText
+            android:id="@+id/et_password_signup_activity"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/et_shape"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:padding="5dp"
+            app:layout_constraintEnd_toEndOf="@+id/et_e_mail_signup_activity"
+            app:layout_constraintStart_toStartOf="@+id/tv_password_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/tv_password_signup_activity" />
+
+        <EditText
+            android:id="@+id/et_pseudo_signup_activity"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/et_shape"
+            android:ems="10"
+            android:inputType="text"
+            android:padding="5dp"
+            app:layout_constraintEnd_toEndOf="@+id/et_e_mail_signup_activity"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tv_password_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/tv_pseudo_signup_activity" />
+
+        <TextView
+            android:id="@+id/tv_password_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Password"
+            android:textColor="@color/grey"
+            app:layout_constraintStart_toStartOf="@+id/et_e_mail_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/et_e_mail_signup_activity" />
+
+        <TextView
+            android:id="@+id/tv_pseudo_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Pseudo"
+            android:textColor="@color/grey"
+            app:layout_constraintStart_toStartOf="@+id/et_password_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/et_password_signup_activity" />
+
+        <TextView
+            android:id="@+id/tv_hobbies_signup_activity2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Select some of your hobbies :"
+            android:textColor="@color/grey"
+            app:layout_constraintStart_toStartOf="@+id/tv_pseudo_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/et_pseudo_signup_activity" />
+
+        <TextView
+            android:id="@+id/tv_e_mail_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="32dp"
+            android:text="E-mail"
+            android:textColor="@color/grey"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/img_profile_signup_activity" />
+
+        <ImageView
+            android:id="@+id/img_profile_signup_activity"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/circle_img_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/et_e_mail_signup_activity"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="64dp"
+            android:background="@drawable/et_shape"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:padding="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tv_e_mail_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/tv_e_mail_signup_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_cooking_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Cooking"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_video_games_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_video_games_signup_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_drawing_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Drawing"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_music_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_photography_signup_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_music_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Music"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/et_pseudo_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/tv_hobbies_signup_activity2" />
+
+        <CheckBox
+            android:id="@+id/cb_photography_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Photography"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_music_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_travel_signup_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_video_games_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Video games"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_science_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_science_signup_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_science_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Science"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/tv_hobbies_signup_activity2" />
+
+        <CheckBox
+            android:id="@+id/cb_travel_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Travelling"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_music_signup_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_music_signup_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_sport_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Sports"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/cb_cooking_signup_activity" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="205dp" />
+
+        <TextView
+            android:id="@+id/tv_addpicture_signup_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add a picture"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintBottom_toBottomOf="@+id/img_profile_signup_activity"
+            app:layout_constraintEnd_toEndOf="@+id/img_profile_signup_activity"
+            app:layout_constraintStart_toStartOf="@+id/img_profile_signup_activity"
+            app:layout_constraintTop_toTopOf="@+id/img_profile_signup_activity" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</ScrollView>
