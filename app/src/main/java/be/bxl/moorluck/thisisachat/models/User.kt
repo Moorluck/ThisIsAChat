@@ -4,6 +4,6 @@ data class User(
     val email : String? = null,
     val pseudo : String? = null,
     val rooms : List<Room> = listOf(),
-    val imgId : String? = null,
+    val imgUrl : String? = null,
     val position : Position = Position()
 )

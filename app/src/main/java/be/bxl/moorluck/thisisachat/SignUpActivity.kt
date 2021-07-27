@@ -1,19 +1,26 @@
 package be.bxl.moorluck.thisisachat
 
+import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import be.bxl.moorluck.thisisachat.models.Position
 import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
+import java.util.*
 
 class SignUpActivity : AppCompatActivity() {
 
@@ -27,10 +34,13 @@ class SignUpActivity : AppCompatActivity() {
 
     // Firebase
 
-    lateinit var auth : FirebaseAuth
-    lateinit var databaseReference : DatabaseReference
+    private lateinit var auth : FirebaseAuth
+    private lateinit var databaseReference : DatabaseReference
+    private lateinit var storageReference: StorageReference
 
     // View
+
+    lateinit var tvAddPicture : TextView
 
     lateinit var etEmail : EditText
     lateinit var etPassword : EditText
@@ -49,6 +59,23 @@ class SignUpActivity : AppCompatActivity() {
 
     lateinit var imgProfile : ImageView
 
+    // Photo URI
+
+    private var uri : Uri? = null
+    private lateinit var imgUrl : String
+
+    // activity for result to pick a photo (need to be outside of the activity)
+
+    private val getContent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            uri = it.data?.data
+            if (uri != null) {
+                val source = ImageDecoder.createSource(contentResolver, uri!!)
+                val profileDrawable = ImageDecoder.decodeDrawable(source)
+                imgProfile.setImageDrawable(profileDrawable)
+            }
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,8 +88,11 @@ class SignUpActivity : AppCompatActivity() {
         databaseReference = Firebase
             .database("https://thisisachat-b0f70-default-rtdb.europe-west1.firebasedatabase.app")
             .reference
+        storageReference = Firebase.storage("gs://thisisachat-b0f70.appspot.com").reference
 
         // View
+
+        tvAddPicture = findViewById(R.id.tv_addpicture_signup_activity)
 
         etEmail = findViewById(R.id.et_e_mail_signup_activity)
         etPassword = findViewById(R.id.et_password_signup_activity)
@@ -88,16 +118,42 @@ class SignUpActivity : AppCompatActivity() {
             val pseudo = etPseudo.text.toString()
 
             if (email.trim() != "" && password.trim() != "" && pseudo.trim() != "") {
-                registerUser(email, password, pseudo)
+                uploadImgAndAddUserToDatabase(uri, email, password, pseudo)
             }
             else {
                 Toast.makeText(this, "You must fill all the fields", Toast.LENGTH_LONG).show()
             }
+        }
 
+        imgProfile.setOnClickListener {
+            tvAddPicture.visibility = View.INVISIBLE
+
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            getContent.launch(intent)
         }
     }
 
-    private fun registerUser(email : String, password : String, pseudo : String) {
+    private fun uploadImgAndAddUserToDatabase(uri : Uri? = null, email : String, password : String, pseudo : String) {
+        if (uri != null) {
+            val fileName = UUID.randomUUID()
+            val imageRef = storageReference.child("images/$fileName")
+
+            imageRef.putFile(uri)
+                .addOnSuccessListener {
+                    imageRef.downloadUrl.addOnSuccessListener {
+                        Log.d("URL", it.toString())
+                        imgUrl = it.toString()
+                        registerUser(email, password, pseudo, imgUrl)
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error while uploading image", Toast.LENGTH_LONG).show()
+                }
+        }
+    }
+
+    private fun registerUser(email : String, password : String, pseudo : String, imgUrl : String) {
 
         // Signing up user
 
@@ -106,8 +162,7 @@ class SignUpActivity : AppCompatActivity() {
                 if (it.isSuccessful) {
                     val latLong : Position = manageLocalization()
                     val rooms = getInitialRoomByHobbies()
-                    val imgID : String? = uploadImg()
-                    val user = User(email, pseudo, rooms, imgID, latLong)
+                    val user = User(email, pseudo, rooms, imgUrl, latLong)
 
                     val fireBaseUserId : String = it.result?.user!!.uid
 
@@ -125,10 +180,9 @@ class SignUpActivity : AppCompatActivity() {
                                 Toast.makeText(this, "Error while updating database", Toast.LENGTH_LONG).show()
                             }
                         }
-                        .addOnCanceledListener {
+                        .addOnFailureListener {
                             Toast.makeText(this, "Error while signing uupdating database", Toast.LENGTH_LONG).show()
                         }
-
 
                 }
                 else {
@@ -148,8 +202,5 @@ class SignUpActivity : AppCompatActivity() {
         return Position()
     }
 
-    private fun uploadImg(bitmap: Bitmap? = null) : String? {
-        //TODO upload image to firebase and get the image ID
-        return null
-    }
+
 }
