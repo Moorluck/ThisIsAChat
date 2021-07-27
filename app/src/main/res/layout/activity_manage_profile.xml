@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darkGreen"
+    tools:context=".SignUpActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_modify_manage_profile_activity"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="Modify"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cb_sport_manage_profile_activity" />
+
+        <EditText
+            android:id="@+id/et_pseudo_manage_profile_activity"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="64dp"
+            android:background="@drawable/et_shape"
+            android:ems="10"
+            android:inputType="text"
+            android:padding="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_pseudo_manage_profile_activity" />
+
+        <TextView
+            android:id="@+id/tv_pseudo_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Pseudo"
+            android:textColor="@color/grey"
+            app:layout_constraintStart_toStartOf="@+id/et_pseudo_manage_profile_activity"
+            app:layout_constraintTop_toBottomOf="@+id/img_profile_manage_profile_activity" />
+
+        <TextView
+            android:id="@+id/tv_hobbies_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Select some of your hobbies :"
+            android:textColor="@color/grey"
+            app:layout_constraintStart_toStartOf="@+id/tv_pseudo_manage_profile_activity"
+            app:layout_constraintTop_toBottomOf="@+id/et_pseudo_manage_profile_activity" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_profile_manage_profile_activity"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/circle_photo_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/cb_cooking_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cooking"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_video_games_manage_profile_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_video_games_manage_profile_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_drawing_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Drawing"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_music_manage_profile_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_photography_manage_profile_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_music_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Music"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/et_pseudo_manage_profile_activity"
+            app:layout_constraintTop_toBottomOf="@+id/tv_hobbies_manage_profile_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_photography_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Photography"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_music_manage_profile_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_travel_manage_profile_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_video_games_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video games"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_science_manage_profile_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_science_manage_profile_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_science_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Science"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/tv_hobbies_manage_profile_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_travel_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Travelling"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/cb_music_manage_profile_activity"
+            app:layout_constraintTop_toBottomOf="@+id/cb_music_manage_profile_activity" />
+
+        <CheckBox
+            android:id="@+id/cb_sport_manage_profile_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sports"
+            android:textColor="@color/lightPurple"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/cb_cooking_manage_profile_activity" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="205dp" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</ScrollView>

@@ -70,6 +70,7 @@ class SignUpActivity : AppCompatActivity() {
         if (it.resultCode == Activity.RESULT_OK) {
             uri = it.data?.data
             if (uri != null) {
+                tvAddPicture.visibility = View.INVISIBLE
                 val source = ImageDecoder.createSource(contentResolver, uri!!)
                 val profileDrawable = ImageDecoder.decodeDrawable(source)
                 imgProfile.setImageDrawable(profileDrawable)
@@ -126,7 +127,6 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         imgProfile.setOnClickListener {
-            tvAddPicture.visibility = View.INVISIBLE
 
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
@@ -148,7 +148,7 @@ class SignUpActivity : AppCompatActivity() {
                     }
                 }
                 .addOnFailureListener {
-                    Toast.makeText(this, "Error while uploading image", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Error while uploading image : $it", Toast.LENGTH_LONG).show()
                 }
         }
     }
@@ -173,6 +173,7 @@ class SignUpActivity : AppCompatActivity() {
                                 Toast.makeText(this, "Sign up !", Toast.LENGTH_LONG).show()
 
                                 val intent = Intent(this, RoomActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 startActivity(intent)
                                 finish()
                             }
@@ -186,10 +187,9 @@ class SignUpActivity : AppCompatActivity() {
 
                 }
                 else {
-                    Toast.makeText(this, "Error while signing up", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Error while signing up ${it.exception}", Toast.LENGTH_LONG).show()
                 }
         }
-        // uploadImg(imgProfile.drawable as Bitmap)
     }
 
     private fun getInitialRoomByHobbies(): List<Room> {
