@@ -12,12 +12,10 @@ import android.os.Looper
 import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import be.bxl.moorluck.thisisachat.models.Position
 import com.google.android.gms.location.*
 
-class LocationHelper(val activity: AppCompatActivity, val onLocationEventListener: (Coordinate) -> Unit) {
-
-    // Définition d'un classe pour stocker le resultat du GPS
-    data class Coordinate(val lat: Double, val lon: Double)
+class LocationHelper(val activity: AppCompatActivity, val onLocationEventListener: (Position) -> Unit) {
 
     companion object {
         const val REQUEST_PERMSSION_GPS: Int = 2_423_251
@@ -49,7 +47,7 @@ class LocationHelper(val activity: AppCompatActivity, val onLocationEventListene
 
             if(location != null) {
                 // Si les données sont OK, on envoie les données via un event
-                val coord: Coordinate = Coordinate(location.latitude, location.longitude)
+                val coord = Position(location.latitude, location.longitude)
                 onLocationEventListener.invoke(coord)
             }
             else {
@@ -101,7 +99,7 @@ class LocationHelper(val activity: AppCompatActivity, val onLocationEventListene
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
-            val coord: Coordinate = Coordinate(
+            val coord = Position(
                 result.lastLocation.latitude,
                 result.lastLocation.longitude
             )

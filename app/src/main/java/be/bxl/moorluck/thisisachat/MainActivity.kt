@@ -58,6 +58,9 @@ class MainActivity : AppCompatActivity() {
                         startActivity(intent)
                     }
                 }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error while loggin in : $it", Toast.LENGTH_LONG).show()
+                }
         }
     }
 }

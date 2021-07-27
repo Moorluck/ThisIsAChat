@@ -1,5 +1,6 @@
 package be.bxl.moorluck.thisisachat
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -36,6 +37,7 @@ class ManageProfileActivity : AppCompatActivity() {
     lateinit var cbSport : CheckBox
 
     lateinit var btnModify : Button
+    lateinit var btnSignOut : Button
 
     lateinit var imgProfile : ImageView
 
@@ -73,8 +75,11 @@ class ManageProfileActivity : AppCompatActivity() {
         cbSport = findViewById(R.id.cb_sport_manage_profile_activity)
 
         btnModify = findViewById(R.id.btn_modify_manage_profile_activity)
+        btnSignOut = findViewById(R.id.btn_sign_out_maage_profile_activity)
 
         imgProfile = findViewById(R.id.img_profile_manage_profile_activity)
+
+        // OnClick
 
         btnModify.setOnClickListener {
             //TODO gestion modification du pseudo
@@ -84,6 +89,13 @@ class ManageProfileActivity : AppCompatActivity() {
         imgProfile.setOnClickListener {
             //TODO gestion suppression et ajout d'image
             return@setOnClickListener
+        }
+
+        btnSignOut.setOnClickListener {
+            auth.signOut()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
         }
 
         if (userFirebase != null) {

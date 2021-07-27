@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import be.bxl.moorluck.thisisachat.helpers.LocationHelper
 import be.bxl.moorluck.thisisachat.models.Position
 import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
@@ -62,7 +63,16 @@ class SignUpActivity : AppCompatActivity() {
     // Photo URI
 
     private var uri : Uri? = null
+
+
+    // User Info
+
+    private lateinit var email: String
+    private lateinit var password: String
+    private lateinit var pseudo: String
     private lateinit var imgUrl : String
+    private lateinit var latLong : Position
+    private lateinit var rooms : List<Room>
 
     // activity for result to pick a photo (need to be outside of the activity)
 
@@ -114,12 +124,18 @@ class SignUpActivity : AppCompatActivity() {
 
         btnSignUp.setOnClickListener {
 
-            val email = etEmail.text.toString()
-            val password = etPassword.text.toString()
-            val pseudo = etPseudo.text.toString()
+            email = etEmail.text.toString()
+            password = etPassword.text.toString()
+            pseudo = etPseudo.text.toString()
 
             if (email.trim() != "" && password.trim() != "" && pseudo.trim() != "") {
-                uploadImgAndAddUserToDatabase(uri, email, password, pseudo)
+                // Get position then create or join the rooms
+                val locationHelper = LocationHelper(this) { pos ->
+                    Log.d("Position", "woups")
+                    latLong = pos
+                    getInitialRoomByHobbies()
+                }
+                locationHelper.getLastLocation()
             }
             else {
                 Toast.makeText(this, "You must fill all the fields", Toast.LENGTH_LONG).show()
@@ -134,17 +150,24 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun uploadImgAndAddUserToDatabase(uri : Uri? = null, email : String, password : String, pseudo : String) {
+    private fun getInitialRoomByHobbies() {
+        //TODO generate the real room via api call to reverse geocoding
+        rooms = listOf()
+        uploadImgAndAddUserToDatabase()
+    }
+
+    private fun uploadImgAndAddUserToDatabase() {
+        // Upload image then register the user (can't do the opposite)
         if (uri != null) {
             val fileName = UUID.randomUUID()
             val imageRef = storageReference.child("images/$fileName")
 
-            imageRef.putFile(uri)
+            imageRef.putFile(uri!!)
                 .addOnSuccessListener {
                     imageRef.downloadUrl.addOnSuccessListener {
                         Log.d("URL", it.toString())
                         imgUrl = it.toString()
-                        registerUser(email, password, pseudo, imgUrl)
+                        registerUser()
                     }
                 }
                 .addOnFailureListener {
@@ -153,15 +176,14 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun registerUser(email : String, password : String, pseudo : String, imgUrl : String) {
+
+
+    private fun registerUser() {
 
         // Signing up user
-
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { it ->
                 if (it.isSuccessful) {
-                    val latLong : Position = manageLocalization()
-                    val rooms = getInitialRoomByHobbies()
                     val user = User(email, pseudo, rooms, imgUrl, latLong)
 
                     val fireBaseUserId : String = it.result?.user!!.uid
@@ -192,15 +214,7 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun getInitialRoomByHobbies(): List<Room> {
-        //TODO get room checking the ceckboxes
-        return listOf()
-    }
 
-    private fun manageLocalization(): Position {
-        //TODO find localization with reverse geocoding
-        return Position()
-    }
 
 
 }
