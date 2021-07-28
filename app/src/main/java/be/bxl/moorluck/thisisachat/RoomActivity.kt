@@ -5,7 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import be.bxl.moorluck.thisisachat.fragments.PrivateFragment
+import be.bxl.moorluck.thisisachat.fragments.RoomFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -16,6 +20,15 @@ class RoomActivity : AppCompatActivity() {
     // Firebase
 
     private lateinit var auth : FirebaseAuth
+
+    // View
+
+    private lateinit var bottomNav : BottomNavigationView
+
+    // Fragment
+    private lateinit var fragmentManager: FragmentManager
+    private lateinit var roomFragment: Fragment
+    private lateinit var privateFragment : Fragment
 
     // User Data from firebase
 
@@ -32,10 +45,45 @@ class RoomActivity : AppCompatActivity() {
         // Check if the user is logged in
 
         initializeUserFromFirebase()
+
+        // View
+
+        bottomNav = findViewById(R.id.bottom_nav_room_activity)
+
+        // Fragment manage and initial fragment
+        fragmentManager = supportFragmentManager
+        roomFragment = RoomFragment.newInstance()
+        privateFragment = PrivateFragment.newInstance()
+
+        fragmentManager.beginTransaction()
+            .replace(R.id.fl_fragment_container_room_activity, roomFragment)
+            .commit()
+
+
+
+        // Initialize bottom nav
+
+        bottomNav.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.menu_room -> {
+                    fragmentManager.beginTransaction()
+                        .replace(R.id.fl_fragment_container_room_activity, roomFragment)
+                        .commit()
+                    true
+                }
+                R.id.menu_private -> {
+                    fragmentManager.beginTransaction()
+                        .replace(R.id.fl_fragment_container_room_activity, privateFragment)
+                        .commit()
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.room_menu, menu)
+        menuInflater.inflate(R.menu.room_menu_action_bar, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
