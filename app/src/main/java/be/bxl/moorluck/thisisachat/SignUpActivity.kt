@@ -171,8 +171,8 @@ class SignUpActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.Main) {
             try {
                 val response = RetrofitInstance.api.getPlace(
-                    BigDecimal(latLong.lat).setScale(5, RoundingMode.HALF_EVEN).toDouble(),
-                    BigDecimal(latLong.long).setScale(5, RoundingMode.HALF_EVEN).toDouble()
+                    latLong.lat,
+                    latLong.long
                 )
                 getInitialRoomByHobbies(response)
             }
@@ -191,7 +191,7 @@ class SignUpActivity : AppCompatActivity() {
         Log.d("PLACE", "$country $state $city")
 
         if (country != null && state != null && city != null) {
-            uploadImgAndAddUserToDatabase()
+            uploadImg()
         }
         else {
             Toast.makeText(this@SignUpActivity, "Error generating rooms", Toast.LENGTH_LONG).show()
@@ -200,7 +200,7 @@ class SignUpActivity : AppCompatActivity() {
 
 
 
-    private fun uploadImgAndAddUserToDatabase() {
+    private fun uploadImg() {
         // Upload image then register the user (can't do the opposite)
         if (uri != null) {
             val fileName = UUID.randomUUID()
@@ -241,15 +241,41 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
+    private fun addUserToARoom(roomName : String) {
+        databaseReference.child("rooms")
+            .child(roomName)
+            .child("users")
+            .child(userId)
+            .setValue(pseudo)
+
+        databaseReference.child("rooms")
+            .child(roomName)
+            .child("grades")
+            .child("0")
+            .child("users")
+            .get()
+            .addOnSuccessListener { users ->
+                val listOfUserIdAtGrade : MutableList<String> = mutableListOf()
+                users.children.forEach { user ->
+                    listOfUserIdAtGrade.add(user.value.toString())
+                }
+
+                listOfUserIdAtGrade.add(userId)
+
+                databaseReference.child("rooms")
+                    .child(roomName)
+                    .child("grades")
+                    .child("0")
+                    .child("users")
+                    .setValue(listOfUserIdAtGrade)
+            }
+    }
+
     private fun generatePlaceRooms() {
         databaseReference.child("rooms").child(country!!).get()
             .addOnSuccessListener {
                 if (it.exists()) {
-                    databaseReference.child("rooms")
-                        .child(country!!)
-                        .child("users")
-                        .child(userId)
-                        .setValue(pseudo)
+                    addUserToARoom(country!!)
 
                     _rooms.add(country!!)
                     generateStateRoom()
@@ -271,11 +297,7 @@ class SignUpActivity : AppCompatActivity() {
         databaseReference.child("rooms").child(state!!).get()
             .addOnSuccessListener {
                 if (it.exists()) {
-                    databaseReference.child("rooms")
-                        .child(state!!)
-                        .child("users")
-                        .child(userId)
-                        .setValue(pseudo)
+                    addUserToARoom(state!!)
 
                     _rooms.add(state!!)
                     generateCityRoom()
@@ -296,16 +318,11 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun generateCityRoom() {
         databaseReference.child("rooms").child(city!!).get()
-            .addOnSuccessListener {
+            .addOnSuccessListener { it ->
                 if (it.exists()) {
-                    databaseReference.child("rooms")
-                        .child(city!!)
-                        .child("users")
-                        .child(userId)
-                        .setValue(pseudo)
+                    addUserToARoom(city!!)
 
                     _rooms.add(city!!)
-
                     rooms = _rooms.toList()
 
                     addUserToDataBase()
@@ -316,7 +333,6 @@ class SignUpActivity : AppCompatActivity() {
                     )
 
                     _rooms.add(city!!)
-
                     rooms = _rooms.toList()
 
                     addUserToDataBase()
