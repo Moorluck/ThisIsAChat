@@ -28,8 +28,6 @@ import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.util.*
 
 class SignUpActivity : AppCompatActivity() {
@@ -229,7 +227,7 @@ class SignUpActivity : AppCompatActivity() {
                     userId = it.result?.user!!.uid
                     auth.signInWithEmailAndPassword(email, password)
                         .addOnSuccessListener {
-                            generatePlaceRooms()
+                            generateCountryRooms()
                         }
                         .addOnFailureListener {
                             Log.d("ERROR", "Unable to sign in")
@@ -242,12 +240,14 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun addUserToARoom(roomName : String) {
+
         databaseReference.child("rooms")
             .child(roomName)
             .child("users")
             .child(userId)
             .setValue(pseudo)
 
+        //TODO transform users to a Map
         databaseReference.child("rooms")
             .child(roomName)
             .child("grades")
@@ -271,7 +271,7 @@ class SignUpActivity : AppCompatActivity() {
             }
     }
 
-    private fun generatePlaceRooms() {
+    private fun generateCountryRooms() {
         databaseReference.child("rooms").child(country!!).get()
             .addOnSuccessListener {
                 if (it.exists()) {
@@ -344,6 +344,7 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun addUserToDataBase() {
+        //TODO change rooms to map
         val user = User(email, pseudo, rooms, imgUrl, latLong)
         // Add user data in real-time database
         databaseReference.child("users").child(userId).setValue(user)
@@ -365,6 +366,7 @@ class SignUpActivity : AppCompatActivity() {
             val newMapOfUser = mapOf(userId to pseudo)
             val newListOfGrade = listOf(Grade(users = listOf(userId)))
             room.users = newMapOfUser.toMap()
+            //TODO Transform to a Map
             room.grades = newListOfGrade
 
             databaseReference.child("rooms").child(room.name!!).setValue(room)

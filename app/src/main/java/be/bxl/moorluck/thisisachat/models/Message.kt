@@ -1,7 +1,6 @@
 package be.bxl.moorluck.thisisachat.models
 
-data class Message (
-    val content : String = "",
+class Message (
     val date : Long,
-    val senderId : String
+    val content : String
 )

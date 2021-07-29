@@ -69,7 +69,6 @@ class RoomFragment : Fragment() {
                         .addOnSuccessListener {
                             if (it.exists()) {
                                 listOfRooms.add(it.getValue(Room::class.java)!!)
-
                                 roomAdapter = RoomAdapter()
                                 roomAdapter.rooms = listOfRooms
                                 rvRoom.adapter = roomAdapter
