@@ -10,7 +10,11 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
+import be.bxl.moorluck.thisisachat.api.RetrofitInstance
+import be.bxl.moorluck.thisisachat.api.models.Place
 import be.bxl.moorluck.thisisachat.helpers.LocationHelper
+import be.bxl.moorluck.thisisachat.models.Grade
 import be.bxl.moorluck.thisisachat.models.Position
 import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
@@ -21,6 +25,9 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.*
 
 class SignUpActivity : AppCompatActivity() {
@@ -64,15 +71,21 @@ class SignUpActivity : AppCompatActivity() {
 
     private var uri : Uri? = null
 
-
     // User Info
+
+    private lateinit var userId : String
 
     private lateinit var email: String
     private lateinit var password: String
     private lateinit var pseudo: String
     private lateinit var imgUrl : String
     private lateinit var latLong : Position
-    private lateinit var rooms : List<Room>
+    private var _rooms : MutableList<Room> = mutableListOf()
+    private lateinit var rooms : List<String>
+
+    var country : String? = null
+    var state : String? = null
+    var city : String? = null
 
     // activity for result to pick a photo (need to be outside of the activity)
 
@@ -133,7 +146,7 @@ class SignUpActivity : AppCompatActivity() {
                 val locationHelper = LocationHelper(this) { pos ->
                     Log.d("Position", "woups")
                     latLong = pos
-                    getInitialRoomByHobbies()
+                    executeCallToGetPlace()
                 }
                 locationHelper.getLastLocation()
             }
@@ -150,11 +163,35 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun getInitialRoomByHobbies() {
-        //TODO generate the real room via api call to reverse geocoding
-        rooms = listOf()
-        uploadImgAndAddUserToDatabase()
+    private fun executeCallToGetPlace() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            try {
+                val response = RetrofitInstance.api.getPlace(latLong.lat, latLong.long)
+                getInitialRoomByHobbies(response)
+            }
+            catch (e: Exception) {
+                Toast.makeText(this@SignUpActivity, "Error calling api : $e", Toast.LENGTH_LONG).show()
+            }
+
+        }
     }
+
+    private fun getInitialRoomByHobbies(response : Place) {
+        country = response.address.country
+        state = response.address.state ?: response.address.region ?: response.address.county
+        city = response.address.city ?: response.address.village ?: response.address.town
+
+        Log.d("PLACE", "$country $state $city")
+
+        if (country != null && state != null && city != null) {
+            uploadImgAndAddUserToDatabase()
+        }
+        else {
+            Toast.makeText(this@SignUpActivity, "Error generating rooms", Toast.LENGTH_LONG).show()
+        }
+    }
+
+
 
     private fun uploadImgAndAddUserToDatabase() {
         // Upload image then register the user (can't do the opposite)
@@ -176,37 +213,20 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-
-
     private fun registerUser() {
 
         // Signing up user
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { it ->
                 if (it.isSuccessful) {
-                    val user = User(email, pseudo, rooms, imgUrl, latLong)
-
-                    val fireBaseUserId : String = it.result?.user!!.uid
-
-                    // Add user data in real-time database
-                    databaseReference.child("users").child(fireBaseUserId).setValue(user)
-                        .addOnCompleteListener {
-                            if (it.isSuccessful) {
-                                Toast.makeText(this, "Sign up !", Toast.LENGTH_LONG).show()
-
-                                val intent = Intent(this, RoomActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                startActivity(intent)
-                                finish()
-                            }
-                            else {
-                                Toast.makeText(this, "Error while updating database", Toast.LENGTH_LONG).show()
-                            }
+                    userId = it.result?.user!!.uid
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnSuccessListener {
+                            generatePlaceRooms()
                         }
                         .addOnFailureListener {
-                            Toast.makeText(this, "Error while signing uupdating database", Toast.LENGTH_LONG).show()
+                            Log.d("ERROR", "Unable to sign in")
                         }
-
                 }
                 else {
                     Toast.makeText(this, "Error while signing up ${it.exception}", Toast.LENGTH_LONG).show()
@@ -214,7 +234,111 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
+    private fun generatePlaceRooms() {
+        databaseReference.child("rooms").child(country!!).get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    generateStateRoom()
+                }
+                else {
+                    _rooms.add(
+                        Room(name = country)
+                    )
+                    generateStateRoom()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error while accessing database", Toast.LENGTH_LONG).show()
+            }
+    }
 
+    private fun generateStateRoom() {
+        databaseReference.child("rooms").child(state!!).get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    generateCityRoom()
+                }
+                else {
+                    _rooms.add(
+                        Room(name = state)
+                    )
+                    generateCityRoom()
+                }
+
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error while accessing database", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun generateCityRoom() {
+        databaseReference.child("rooms").child(city!!).get()
+            .addOnSuccessListener {
+
+                if (it.exists()) {
+                    var roomNames = mutableListOf<String>()
+                    for (room in _rooms) {
+                        if (room.name != null) {
+                            roomNames.add(room.name)
+                        }
+                    }
+                    rooms = roomNames.toList()
+
+                    addUserToDataBase()
+                }
+                else {
+                    _rooms.add(
+                        Room(name = city)
+                    )
+
+                    var roomNames = mutableListOf<String>()
+                    for (room in _rooms) {
+                        if (room.name != null) {
+                            roomNames.add(room.name)
+                        }
+                    }
+                    rooms = roomNames.toList()
+
+                    addUserToDataBase()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error while accessing database", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun addUserToDataBase() {
+        val user = User(email, pseudo, rooms, imgUrl, latLong)
+        // Add user data in real-time database
+        databaseReference.child("users").child(userId).setValue(user)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    uploadingNewRooms()
+                }
+                else {
+                    Toast.makeText(this, "Error while updating database", Toast.LENGTH_LONG).show()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error while signing updating database", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun uploadingNewRooms() {
+        for (room in _rooms) {
+            val newMapOfUser = mapOf(userId to pseudo)
+            val newMapOfGrade = listOf(Grade(users = listOf(userId)))
+            room.users = newMapOfUser.toMap()
+            room.grades = newMapOfGrade
+
+            databaseReference.child("rooms").child(room.name!!).setValue(room)
+        }
+
+        val intent = Intent(this, RoomActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish()
+    }
 
 
 }
