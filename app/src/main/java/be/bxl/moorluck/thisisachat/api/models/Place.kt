@@ -6,14 +6,14 @@ data class Place(
     val boundingbox: List<String>,
     val category: String,
     val display_name: String,
-    val importance: Int,
+    val importance: Double,
     val lat: String,
     val licence: String,
     val lon: String,
     val name: Any,
-    val osm_id: Int,
+    val osm_id: Double,
     val osm_type: String,
-    val place_id: Int,
-    val place_rank: Int,
+    val place_id: Double,
+    val place_rank: Double,
     val type: String
 )

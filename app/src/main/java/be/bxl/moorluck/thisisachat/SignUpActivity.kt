@@ -28,6 +28,8 @@ import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
 
 class SignUpActivity : AppCompatActivity() {
@@ -80,7 +82,9 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var pseudo: String
     private lateinit var imgUrl : String
     private lateinit var latLong : Position
-    private var _rooms : MutableList<Room> = mutableListOf()
+
+    private var _rooms : MutableList<String> = mutableListOf()
+    private var _newRooms : MutableList<Room> = mutableListOf()
     private lateinit var rooms : List<String>
 
     var country : String? = null
@@ -166,7 +170,10 @@ class SignUpActivity : AppCompatActivity() {
     private fun executeCallToGetPlace() {
         lifecycleScope.launch(Dispatchers.Main) {
             try {
-                val response = RetrofitInstance.api.getPlace(latLong.lat, latLong.long)
+                val response = RetrofitInstance.api.getPlace(
+                    BigDecimal(latLong.lat).setScale(5, RoundingMode.HALF_EVEN).toDouble(),
+                    BigDecimal(latLong.long).setScale(5, RoundingMode.HALF_EVEN).toDouble()
+                )
                 getInitialRoomByHobbies(response)
             }
             catch (e: Exception) {
@@ -238,10 +245,18 @@ class SignUpActivity : AppCompatActivity() {
         databaseReference.child("rooms").child(country!!).get()
             .addOnSuccessListener {
                 if (it.exists()) {
+                    databaseReference.child("rooms")
+                        .child(country!!)
+                        .child("users")
+                        .child(userId)
+                        .setValue(pseudo)
+
+                    _rooms.add(country!!)
                     generateStateRoom()
                 }
                 else {
-                    _rooms.add(
+                    _rooms.add(country!!)
+                    _newRooms.add(
                         Room(name = country)
                     )
                     generateStateRoom()
@@ -256,10 +271,18 @@ class SignUpActivity : AppCompatActivity() {
         databaseReference.child("rooms").child(state!!).get()
             .addOnSuccessListener {
                 if (it.exists()) {
+                    databaseReference.child("rooms")
+                        .child(state!!)
+                        .child("users")
+                        .child(userId)
+                        .setValue(pseudo)
+
+                    _rooms.add(state!!)
                     generateCityRoom()
                 }
                 else {
-                    _rooms.add(
+                    _rooms.add(state!!)
+                    _newRooms.add(
                         Room(name = state)
                     )
                     generateCityRoom()
@@ -274,30 +297,27 @@ class SignUpActivity : AppCompatActivity() {
     private fun generateCityRoom() {
         databaseReference.child("rooms").child(city!!).get()
             .addOnSuccessListener {
-
                 if (it.exists()) {
-                    var roomNames = mutableListOf<String>()
-                    for (room in _rooms) {
-                        if (room.name != null) {
-                            roomNames.add(room.name)
-                        }
-                    }
-                    rooms = roomNames.toList()
+                    databaseReference.child("rooms")
+                        .child(city!!)
+                        .child("users")
+                        .child(userId)
+                        .setValue(pseudo)
+
+                    _rooms.add(city!!)
+
+                    rooms = _rooms.toList()
 
                     addUserToDataBase()
                 }
                 else {
-                    _rooms.add(
+                    _newRooms.add(
                         Room(name = city)
                     )
 
-                    var roomNames = mutableListOf<String>()
-                    for (room in _rooms) {
-                        if (room.name != null) {
-                            roomNames.add(room.name)
-                        }
-                    }
-                    rooms = roomNames.toList()
+                    _rooms.add(city!!)
+
+                    rooms = _rooms.toList()
 
                     addUserToDataBase()
                 }
@@ -325,11 +345,11 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun uploadingNewRooms() {
-        for (room in _rooms) {
+        for (room in _newRooms) {
             val newMapOfUser = mapOf(userId to pseudo)
-            val newMapOfGrade = listOf(Grade(users = listOf(userId)))
+            val newListOfGrade = listOf(Grade(users = listOf(userId)))
             room.users = newMapOfUser.toMap()
-            room.grades = newMapOfGrade
+            room.grades = newListOfGrade
 
             databaseReference.child("rooms").child(room.name!!).setValue(room)
         }
