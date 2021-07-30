@@ -6,5 +6,5 @@ data class Room (
     val message : Map<String, Message> = mapOf(), // UserID, Content | Attention ! utilisé push pour en faire une liste
     val maxUsers : Int = 20,
     val shortCuts : Map<String, String> = mapOf(), // Message, Imgurl
-    var grades : List<Grade> = listOf() //TODO change to Map<String, Grade>
+    var grades : Map<String, Grade> = mapOf()
 )

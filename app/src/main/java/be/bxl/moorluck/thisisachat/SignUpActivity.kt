@@ -83,7 +83,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private var _rooms : MutableList<String> = mutableListOf()
     private var _newRooms : MutableList<Room> = mutableListOf()
-    private lateinit var rooms : List<String>
+    private var rooms : MutableMap<String, String> = mutableMapOf()
 
     var country : String? = null
     var state : String? = null
@@ -247,28 +247,13 @@ class SignUpActivity : AppCompatActivity() {
             .child(userId)
             .setValue(pseudo)
 
-        //TODO transform users to a Map
         databaseReference.child("rooms")
             .child(roomName)
             .child("grades")
-            .child("0")
+            .child(Grade().name)
             .child("users")
-            .get()
-            .addOnSuccessListener { users ->
-                val listOfUserIdAtGrade : MutableList<String> = mutableListOf()
-                users.children.forEach { user ->
-                    listOfUserIdAtGrade.add(user.value.toString())
-                }
-
-                listOfUserIdAtGrade.add(userId)
-
-                databaseReference.child("rooms")
-                    .child(roomName)
-                    .child("grades")
-                    .child("0")
-                    .child("users")
-                    .setValue(listOfUserIdAtGrade)
-            }
+            .child(userId)
+            .setValue(pseudo)
     }
 
     private fun generateCountryRooms() {
@@ -323,7 +308,10 @@ class SignUpActivity : AppCompatActivity() {
                     addUserToARoom(city!!)
 
                     _rooms.add(city!!)
-                    rooms = _rooms.toList()
+
+                    for (room in _rooms) {
+                        rooms[UUID.randomUUID().toString()] = room
+                    }
 
                     addUserToDataBase()
                 }
@@ -333,7 +321,10 @@ class SignUpActivity : AppCompatActivity() {
                     )
 
                     _rooms.add(city!!)
-                    rooms = _rooms.toList()
+
+                    for (room in _rooms) {
+                        rooms[UUID.randomUUID().toString()] = room
+                    }
 
                     addUserToDataBase()
                 }
@@ -344,8 +335,7 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun addUserToDataBase() {
-        //TODO change rooms to map
-        val user = User(email, pseudo, rooms, imgUrl, latLong)
+        val user = User(email, pseudo, rooms.toMap(), imgUrl, latLong)
         // Add user data in real-time database
         databaseReference.child("users").child(userId).setValue(user)
             .addOnCompleteListener {
@@ -364,10 +354,9 @@ class SignUpActivity : AppCompatActivity() {
     private fun uploadingNewRooms() {
         for (room in _newRooms) {
             val newMapOfUser = mapOf(userId to pseudo)
-            val newListOfGrade = listOf(Grade(users = listOf(userId)))
+            val newMapOfGrade = mapOf(Grade().name to Grade(users = mapOf(userId to pseudo)))
             room.users = newMapOfUser.toMap()
-            //TODO Transform to a Map
-            room.grades = newListOfGrade
+            room.grades = newMapOfGrade
 
             databaseReference.child("rooms").child(room.name!!).setValue(room)
         }

@@ -34,8 +34,8 @@ class RoomAdapter : RecyclerView.Adapter<RoomAdapter.ViewHolder>() {
         val room = rooms[position]
 
         holder.tvRoomName.text = room.name
-        if (!room.message.isEmpty()) {
-            holder.tvLastMessage.text = room.message.last().content
+        if (room.message.isNotEmpty()) {
+            holder.tvLastMessage.text = room.message.values.toMutableList().last().toString()
         }
         val numberUserMessage = "${room.users.size} / ${room.maxUsers}"
         holder.tvNumberOfUser.text = numberUserMessage
