@@ -1,5 +1,6 @@
 package be.bxl.moorluck.thisisachat.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import be.bxl.moorluck.thisisachat.ChatActivity
 import be.bxl.moorluck.thisisachat.R
 import be.bxl.moorluck.thisisachat.adapters.RoomAdapter
 import be.bxl.moorluck.thisisachat.models.Room
@@ -20,7 +22,15 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 
-class RoomFragment : Fragment() {
+class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
+
+    // Companion object
+
+    companion object {
+        @JvmStatic
+        fun newInstance() = RoomFragment()
+        val ROOM_NAME = "ROOM_NAME"
+    }
 
     // Fire Base
     private lateinit var auth : FirebaseAuth
@@ -58,6 +68,7 @@ class RoomFragment : Fragment() {
 
         rvRoom = v.findViewById(R.id.rv_room_fragment)
         rvRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        roomAdapter = RoomAdapter(requireContext(), this)
 
         databaseReference.child("users").child(auth.currentUser!!.uid).child("rooms").get()
             .addOnSuccessListener { roomList ->
@@ -65,11 +76,10 @@ class RoomFragment : Fragment() {
                 val listOfRooms : MutableList<Room> = mutableListOf()
 
                 roomList.children.forEach { room ->
-                    databaseReference.child("rooms").child(room.value.toString()).get()
+                    databaseReference.child("rooms").child("place").child(room.value.toString()).get()
                         .addOnSuccessListener {
                             if (it.exists()) {
                                 listOfRooms.add(it.getValue(Room::class.java)!!)
-                                roomAdapter = RoomAdapter()
                                 roomAdapter.rooms = listOfRooms
                                 rvRoom.adapter = roomAdapter
                             }
@@ -82,8 +92,11 @@ class RoomFragment : Fragment() {
         return v
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance() = RoomFragment()
+
+
+    override fun onItemClickListener(roomName: String?) {
+        val intent = Intent(activity, ChatActivity::class.java)
+        intent.putExtra(ROOM_NAME, roomName)
+        startActivity(intent)
     }
 }
