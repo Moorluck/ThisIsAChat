@@ -1,15 +1,22 @@
 package be.bxl.moorluck.thisisachat
 
+import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.adapters.ChatAdapter
+import be.bxl.moorluck.thisisachat.api.Url
 import be.bxl.moorluck.thisisachat.fragments.RoomFragment
 import be.bxl.moorluck.thisisachat.models.Message
+import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -33,6 +40,8 @@ class ChatActivity : AppCompatActivity() {
 
     // View
 
+    lateinit var clBackground : ConstraintLayout
+
     lateinit var etMessage : EditText
     lateinit var imgSendImage : ImageView
     lateinit var btnSend : Button
@@ -41,6 +50,9 @@ class ChatActivity : AppCompatActivity() {
     // Adapter
 
     lateinit var chatAdapter : ChatAdapter
+
+    // Roomname
+    lateinit var roomName : String
 
     // User
 
@@ -68,6 +80,8 @@ class ChatActivity : AppCompatActivity() {
 
         // View
 
+        clBackground = findViewById(R.id.cl_background_chat_activity)
+
         etMessage = findViewById(R.id.et_message_chat_activity)
         imgSendImage = findViewById(R.id.img_send_image_chat_activity)
         btnSend = findViewById(R.id.btn_send_chat_activity)
@@ -82,11 +96,50 @@ class ChatActivity : AppCompatActivity() {
 
         // Setup title
 
-        val roomName = intent.getStringExtra(RoomFragment.ROOM_NAME) ?: ""
+        roomName = intent.getStringExtra(RoomFragment.ROOM_NAME) ?: ""
         supportActionBar?.title = roomName
 
-        // Get user info
+        setupBackground()
+        getUserInfo()
+        getMessages()
 
+        // OnClick
+
+        btnSend.setOnClickListener {
+            if (etMessage.text.isNotEmpty()) {
+                databaseReference.child("rooms").child("place").child(roomName).child("messages").push()
+                    .setValue(Message(userFirebase!!.uid, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
+            }
+        }
+
+    }
+
+
+
+
+    private fun setupBackground() {
+        databaseReference.child("rooms").child("place").child(roomName).child("photoRef").get()
+            .addOnSuccessListener {
+                Log.d("TAG", it.toString())
+                Glide.with(this)
+                    .asDrawable()
+                    .load(Url.getPhotoUrl(it.value.toString(), 2000, 1000, Url.getApiKey(this)))
+                    .centerCrop()
+                    .into(object : CustomTarget<Drawable>() {
+
+                        override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                            rvMessage.background = resource
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                            Log.d("TAG", "Fail")
+                        }
+
+                    })
+            }
+    }
+
+    private fun getUserInfo() {
         if (userFirebase != null) {
             databaseReference.child("users").child(userFirebase!!.uid).get()
                 .addOnSuccessListener {
@@ -96,9 +149,9 @@ class ChatActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error while loading user : $it", Toast.LENGTH_LONG).show()
                 }
         }
+    }
 
-        // Get message
-
+    private fun getMessages() {
         databaseReference.child("rooms").child("place").child(roomName).child("messages")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -115,15 +168,5 @@ class ChatActivity : AppCompatActivity() {
                 }
 
             })
-
-        // OnClick
-
-        btnSend.setOnClickListener {
-            if (etMessage.text.isNotEmpty()) {
-                databaseReference.child("rooms").child("place").child(roomName).child("messages").push()
-                    .setValue(Message(userFirebase!!.uid, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
-            }
-        }
-
     }
 }

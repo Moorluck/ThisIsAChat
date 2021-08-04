@@ -163,7 +163,7 @@ class SignUpActivity : AppCompatActivity() {
                     latLong.lat,
                     latLong.long
                 )
-                getInitialRoomByHobbies(response)
+                getInitialRoomByPlaces(response)
             }
             catch (e: Exception) {
                 Toast.makeText(this@SignUpActivity, "Error calling api : $e", Toast.LENGTH_LONG).show()
@@ -172,7 +172,7 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun getInitialRoomByHobbies(response : Place) {
+    private fun getInitialRoomByPlaces(response : Place) {
 
         country = response.address.country?.replace("/", "-")
         state = response.address.state?.replace("/", "-")
@@ -182,8 +182,6 @@ class SignUpActivity : AppCompatActivity() {
             ?: response.address.village?.replace("/", "-")
             ?: response.address.town?.replace("/", "-")
 
-        Log.d("PLACE", "$country $state $city")
-
         if (country != null && state != null && city != null) {
             uploadImg()
         }
@@ -191,6 +189,8 @@ class SignUpActivity : AppCompatActivity() {
             Toast.makeText(this@SignUpActivity, "Error generating rooms", Toast.LENGTH_LONG).show()
         }
     }
+
+    //TODO getInitialRoomByHobby
 
 
 
@@ -256,6 +256,8 @@ class SignUpActivity : AppCompatActivity() {
             .child(userId)
             .setValue(pseudo)
     }
+
+    // TODO Generate hobby rooms
 
     private fun generateCountryRooms() {
         databaseReference.child("rooms").child("place").child(country!!).get()
@@ -391,6 +393,7 @@ class SignUpActivity : AppCompatActivity() {
             room.users = newMapOfUser.toMap()
             room.grades = newMapOfGrade
 
+            //TODO uploading hobby rooms
             databaseReference.child("rooms").child("place").child(room.name!!).setValue(room)
         }
 
