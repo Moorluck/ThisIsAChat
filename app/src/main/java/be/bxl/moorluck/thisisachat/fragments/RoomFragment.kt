@@ -7,10 +7,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.ChatActivity
+import be.bxl.moorluck.thisisachat.NewRoomActivity
 import be.bxl.moorluck.thisisachat.R
 import be.bxl.moorluck.thisisachat.adapters.RoomAdapter
 import be.bxl.moorluck.thisisachat.models.Room
@@ -30,7 +31,7 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
         @JvmStatic
         fun newInstance() = RoomFragment()
 
-        val ROOM_NAME = "ROOM_NAME"
+        const val ROOM_NAME = "ROOM_NAME"
     }
 
     // Fire Base
@@ -40,11 +41,17 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
 
     // View
 
-    lateinit var rvRoom : RecyclerView
+    lateinit var rvRegionRoom : RecyclerView
+    lateinit var rvHobbyRoom : RecyclerView
+    lateinit var rvCustomRoom : RecyclerView
+
+    lateinit var btnNewRoom : Button
 
     // Adapter
 
-    lateinit var roomAdapter : RoomAdapter
+    private lateinit var roomRegionAdapter : RoomAdapter
+    lateinit var roomHobbyAdapter : RoomAdapter
+    lateinit var roomCustomAdapter : RoomAdapter
 
     // Room data
 
@@ -65,12 +72,36 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
             .storage("gs://thisisachat-b0f70.appspot.com")
             .reference
 
-        // Set up the recycler view
+        // View
 
-        rvRoom = v.findViewById(R.id.rv_room_fragment)
-        rvRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        roomAdapter = RoomAdapter(requireContext(), this)
+        rvRegionRoom = v.findViewById(R.id.rv_region_room_fragment)
+        rvHobbyRoom = v.findViewById(R.id.rv_hobby_room_fragment)
+        rvCustomRoom = v.findViewById(R.id.rv_custom_room_fragment)
 
+        btnNewRoom = v.findViewById(R.id.btn_new_room_room_fragment)
+
+        // Set up recycler views
+        rvRegionRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        rvHobbyRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        rvCustomRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        roomRegionAdapter = RoomAdapter(requireContext(), this)
+        roomHobbyAdapter = RoomAdapter(requireContext(), this)
+        roomCustomAdapter = RoomAdapter(requireContext(), this)
+
+        getRegionRoom()
+        getHobbyRoom()
+        getCustomRoom()
+
+        //Onclick
+        btnNewRoom.setOnClickListener {
+            val intent = Intent(activity, NewRoomActivity::class.java)
+            startActivity(intent)
+        }
+
+        return v
+    }
+
+    private fun getRegionRoom() {
         databaseReference.child("users").child(auth.currentUser!!.uid).child("rooms").get()
             .addOnSuccessListener { roomList ->
 
@@ -81,16 +112,55 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
                         .addOnSuccessListener {
                             if (it.exists()) {
                                 listOfRooms.add(it.getValue(Room::class.java)!!)
-                                roomAdapter.rooms = listOfRooms
-                                rvRoom.adapter = roomAdapter
+
+                                roomRegionAdapter.rooms = listOfRooms
+                                rvRegionRoom.adapter = roomRegionAdapter
+
                             }
                         }
                 }
 
-
             }
 
-        return v
+
+    }
+
+    private fun getHobbyRoom() {
+        databaseReference.child("users").child(auth.currentUser!!.uid).child("rooms").get()
+            .addOnSuccessListener { roomList ->
+
+                val listOfRooms : MutableList<Room> = mutableListOf()
+
+                roomList.children.forEach { room ->
+                    databaseReference.child("rooms").child("hobby").child(room.value.toString()).get()
+                        .addOnSuccessListener {
+                            if (it.exists()) {
+                                listOfRooms.add(it.getValue(Room::class.java)!!)
+                                roomHobbyAdapter.rooms = listOfRooms
+                                rvHobbyRoom.adapter = roomHobbyAdapter
+                            }
+                        }
+                }
+            }
+    }
+
+    private fun getCustomRoom() {
+        databaseReference.child("users").child(auth.currentUser!!.uid).child("rooms").get()
+            .addOnSuccessListener { roomList ->
+
+                val listOfRooms : MutableList<Room> = mutableListOf()
+
+                roomList.children.forEach { room ->
+                    databaseReference.child("rooms").child("custom").child(room.value.toString()).get()
+                        .addOnSuccessListener {
+                            if (it.exists()) {
+                                listOfRooms.add(it.getValue(Room::class.java)!!)
+                                roomCustomAdapter.rooms = listOfRooms
+                                rvCustomRoom.adapter = roomCustomAdapter
+                            }
+                        }
+                }
+            }
     }
 
     override fun onItemClickListener(roomName: String?) {

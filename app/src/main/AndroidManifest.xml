@@ -14,16 +14,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ThisIsAChat">
         <activity
+            android:name=".NewRoomActivity"
+            android:exported="true" />
+        <activity
             android:name=".ChatActivity"
             android:exported="true">
-            <meta-data android:name="android.support.PARENT_ACTIVITY"
-                android:value=".RoomActivity"
-                />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".RoomActivity" />
         </activity>
         <activity android:name=".ManageProfileActivity">
-            <meta-data android:name="android.support.PARENT_ACTIVITY"
-                android:value=".RoomActivity"
-                />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".RoomActivity" />
         </activity>
         <activity android:name=".RoomActivity">
             <intent-filter>
@@ -31,11 +34,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-
         </activity>
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

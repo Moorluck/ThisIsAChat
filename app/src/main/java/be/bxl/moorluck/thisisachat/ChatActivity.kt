@@ -108,7 +108,7 @@ class ChatActivity : AppCompatActivity() {
         btnSend.setOnClickListener {
             if (etMessage.text.isNotEmpty()) {
                 databaseReference.child("rooms").child("place").child(roomName).child("messages").push()
-                    .setValue(Message(userFirebase!!.uid, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
+                    .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
             }
         }
 
@@ -132,7 +132,6 @@ class ChatActivity : AppCompatActivity() {
                         }
 
                         override fun onLoadCleared(placeholder: Drawable?) {
-                            Log.d("TAG", "Fail")
                         }
 
                     })
