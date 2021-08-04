@@ -15,14 +15,24 @@
         android:theme="@style/Theme.ThisIsAChat">
         <activity
             android:name=".ChatActivity"
-            android:exported="true" />
-        <activity android:name=".ManageProfileActivity" />
+            android:exported="true">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".RoomActivity"
+                />
+        </activity>
+        <activity android:name=".ManageProfileActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".RoomActivity"
+                />
+        </activity>
         <activity android:name=".RoomActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
         <activity android:name=".SignUpActivity" />
         <activity android:name=".MainActivity"></activity>

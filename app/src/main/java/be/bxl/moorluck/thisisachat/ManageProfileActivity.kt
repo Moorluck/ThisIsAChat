@@ -98,6 +98,10 @@ class ManageProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Action bar title
+
+        supportActionBar?.title = "Manage Profile"
+
         if (userFirebase != null) {
             databaseReference.child("users").child(userFirebase!!.uid).get()
                 .addOnSuccessListener {

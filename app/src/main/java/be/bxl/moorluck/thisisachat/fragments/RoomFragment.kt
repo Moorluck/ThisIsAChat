@@ -29,6 +29,7 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
     companion object {
         @JvmStatic
         fun newInstance() = RoomFragment()
+
         val ROOM_NAME = "ROOM_NAME"
     }
 
@@ -91,8 +92,6 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
 
         return v
     }
-
-
 
     override fun onItemClickListener(roomName: String?) {
         val intent = Intent(activity, ChatActivity::class.java)

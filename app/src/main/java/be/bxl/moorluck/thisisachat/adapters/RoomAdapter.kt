@@ -21,10 +21,6 @@ import com.bumptech.glide.request.transition.Transition
 class RoomAdapter(private val context : Context, private val itemClickListener : ItemClickListener) : RecyclerView.Adapter<RoomAdapter.ViewHolder>() {
 
     var rooms : List<Room> = listOf()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val flRoom : FrameLayout = itemView.findViewById(R.id.fl_item_room)

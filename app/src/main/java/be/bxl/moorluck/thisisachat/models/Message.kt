@@ -1,6 +1,10 @@
 package be.bxl.moorluck.thisisachat.models
 
-class Message (
-    val date : Long,
-    val content : String
+import java.time.LocalDate
+
+data class Message (
+    val userId : String? = null,
+    val imgProfileRef : String? = null,
+    val date : String? = null,
+    val content : String? = null
 )
