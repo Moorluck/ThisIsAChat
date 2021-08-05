@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import be.bxl.moorluck.thisisachat.api.RetrofitInstance
 import be.bxl.moorluck.thisisachat.api.Url
 import be.bxl.moorluck.thisisachat.api.models.Place
+import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.helpers.LocationHelper
 import be.bxl.moorluck.thisisachat.models.Grade
 import be.bxl.moorluck.thisisachat.models.Position
@@ -74,8 +75,10 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var imgUrl : String
     private lateinit var latLong : Position
 
-    private var _rooms : MutableList<String> = mutableListOf()
-    private var _newRooms : MutableList<Room> = mutableListOf()
+    private var _placeRooms : MutableList<String> = mutableListOf()
+    private var _hobbyRooms : MutableList<String> = mutableListOf()
+    private var _newPlaceRooms : MutableList<Room> = mutableListOf()
+    private var _newHobbyRooms : MutableList<Room> = mutableListOf()
     private var rooms : MutableMap<String, String> = mutableMapOf()
 
     var country : String? = null
@@ -105,9 +108,9 @@ class SignUpActivity : AppCompatActivity() {
 
         auth = Firebase.auth
         databaseReference = Firebase
-            .database("https://thisisachat-b0f70-default-rtdb.europe-west1.firebasedatabase.app")
+            .database(FirebaseConst.URL_DATABASE)
             .reference
-        storageReference = Firebase.storage("gs://thisisachat-b0f70.appspot.com").reference
+        storageReference = Firebase.storage(FirebaseConst.URL_STORAGE).reference
 
         // View
 
@@ -183,16 +186,51 @@ class SignUpActivity : AppCompatActivity() {
             ?: response.address.town?.replace("/", "-")
 
         if (country != null && state != null && city != null) {
-            uploadImg()
+            _placeRooms.add(country!!)
+            _placeRooms.add(state!!)
+            _placeRooms.add(city!!)
+            getInitialRoomByHobby()
         }
         else {
             Toast.makeText(this@SignUpActivity, "Error generating rooms", Toast.LENGTH_LONG).show()
         }
     }
 
-    //TODO getInitialRoomByHobby
+    private fun getInitialRoomByHobby() {
+        if (cbCooking.isChecked) {
+            _hobbyRooms.add(cbCooking.text.toString())
+        }
 
+        if (cbMusic.isChecked) {
+            _hobbyRooms.add(cbMusic.text.toString())
+        }
 
+        if (cbTravelling.isChecked) {
+            _hobbyRooms.add(cbTravelling.text.toString())
+        }
+
+        if (cbPhotography.isChecked) {
+            _hobbyRooms.add(cbPhotography.text.toString())
+        }
+
+        if (cbDrawing.isChecked) {
+            _hobbyRooms.add(cbDrawing.text.toString())
+        }
+
+        if (cbScience.isChecked) {
+            _hobbyRooms.add(cbScience.text.toString())
+        }
+
+        if (cbVideoGames.isChecked) {
+            _hobbyRooms.add(cbVideoGames.text.toString())
+        }
+
+        if (cbSport.isChecked) {
+            _hobbyRooms.add(cbSport.text.toString())
+        }
+
+        uploadImg()
+    }
 
     private fun uploadImg() {
         // Upload image then register the user (can't do the opposite)
@@ -203,7 +241,6 @@ class SignUpActivity : AppCompatActivity() {
             imageRef.putFile(uri!!)
                 .addOnSuccessListener {
                     imageRef.downloadUrl.addOnSuccessListener {
-                        Log.d("URL", it.toString())
                         imgUrl = it.toString()
                         registerUser()
                     }
@@ -223,7 +260,7 @@ class SignUpActivity : AppCompatActivity() {
                     userId = it.result?.user!!.uid
                     auth.signInWithEmailAndPassword(email, password)
                         .addOnSuccessListener {
-                            generateCountryRooms()
+                            generateHobbyRooms()
                         }
                         .addOnFailureListener {
                             Log.d("ERROR", "Unable to sign in")
@@ -236,142 +273,141 @@ class SignUpActivity : AppCompatActivity() {
     }
 
 
-    private fun addUserToARoom(roomName : String) {
+    private fun addUserToARoom(roomName : String, type : String) {
 
         // Add a user when the room already exist
 
-        databaseReference.child("rooms")
-            .child("place")
+        databaseReference.child(FirebaseConst.ROOMS)
+            .child(type)
             .child(roomName)
-            .child("users")
+            .child(FirebaseConst.USERS)
             .child(userId)
             .setValue(pseudo)
 
-        databaseReference.child("rooms")
-            .child("place")
+        databaseReference.child(FirebaseConst.ROOMS)
+            .child(type)
             .child(roomName)
-            .child("grades")
+            .child(FirebaseConst.GRADES)
             .child(Grade().name)
-            .child("users")
+            .child(FirebaseConst.USERS)
             .child(userId)
             .setValue(pseudo)
     }
 
-    // TODO Generate hobby rooms
+    private fun generateHobbyRooms() {
 
-    private fun generateCountryRooms() {
-        databaseReference.child("rooms").child("place").child(country!!).get()
-            .addOnSuccessListener {
-                if (it.exists()) {
-                    addUserToARoom(country!!)
+        if (_hobbyRooms.isNotEmpty()) {
+            for ((index, room) in _hobbyRooms.withIndex()) {
 
-                    _rooms.add(country!!)
-                    generateStateRoom()
-                }
-                else {
-                    _rooms.add(country!!)
+                databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(room).get()
+                    .addOnSuccessListener {
+                        if (it.exists()) {
+                            if (index == _hobbyRooms.size - 1) {
 
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        try {
-                            val result = RetrofitInstance.apiPlace.getPlacesDetail(country!!, Url.getApiKey(this@SignUpActivity))
+                                for (hobbyRoom in _hobbyRooms) {
+                                    rooms[UUID.randomUUID().toString()] = hobbyRoom
+                                }
 
-                            _newRooms.add(
-                                Room(name = country, photoRef = result.results[0].photos[0].photo_reference)
-                            )
-                            generateStateRoom()
+                                lifecycleScope.launch(Dispatchers.Main) {
+                                    addUserToARoom(room, "hobby")
+                                    generatePlacesRooms()
+                                }
+                            }
+                            else {
+                                addUserToARoom(room, "hobby")
+                            }
                         }
-                        catch(e : Exception)  {
-                            Toast.makeText(this@SignUpActivity, "Error while loading place photo : $e", Toast.LENGTH_LONG).show()
+                        else {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                try {
+                                    //TODO autre photo
+                                    val photoRef = "https://firebasestorage.googleapis.com/v0/b/thisisachat-b0f70.appspot.com/o/images%2Fhobby.jpg?alt=media&token=e8eeb7e3-d5b6-40b1-b919-ec54104f8ae4"
+                                    _newHobbyRooms.add(
+                                        Room(name = room, photoRef = photoRef, type = "hobby")
+                                    )
+                                }
+                                catch(e : Exception)  {
+                                    Toast.makeText(this@SignUpActivity, "Error while loading place photo : $e", Toast.LENGTH_LONG).show()
+                                }
+
+                                if (index == _hobbyRooms.size - 1) {
+
+                                    for (hobbyRoom in _hobbyRooms) {
+                                        rooms[UUID.randomUUID().toString()] = hobbyRoom
+                                    }
+
+                                    generatePlacesRooms()
+                                }
+                            }
                         }
                     }
-
-
-                }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Error while accessing database", Toast.LENGTH_LONG).show()
+                    }
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "Error while accessing database", Toast.LENGTH_LONG).show()
-            }
+        }
+        else {
+            generatePlacesRooms()
+        }
+
     }
 
-    private fun generateStateRoom() {
-        databaseReference.child("rooms").child("place").child(state!!).get()
-            .addOnSuccessListener {
-                if (it.exists()) {
-                    addUserToARoom(state!!)
+    private fun generatePlacesRooms() {
+        for ((index, room) in _placeRooms.withIndex()) {
 
-                    _rooms.add(state!!)
-                    generateCityRoom()
-                }
-                else {
-                    _rooms.add(state!!)
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        try {
-                            val result = RetrofitInstance.apiPlace.getPlacesDetail(state!!, Url.getApiKey(this@SignUpActivity))
+            databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PLACE).child(room).get()
+                .addOnSuccessListener {
+                    if (it.exists()) {
+                        if (index == _placeRooms.size - 1) {
 
-                            _newRooms.add(
-                                Room(name = state, photoRef = result.results[0].photos[0].photo_reference)
-                            )
-                            generateCityRoom()
-                        }
-                        catch(e : Exception)  {
-                            Toast.makeText(this@SignUpActivity, "Error while loading place photo : $e", Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
-
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Error while accessing database", Toast.LENGTH_LONG).show()
-            }
-    }
-
-    private fun generateCityRoom() {
-        databaseReference.child("rooms").child("place").child(city!!).get()
-            .addOnSuccessListener { it ->
-                if (it.exists()) {
-                    addUserToARoom(city!!)
-
-                    _rooms.add(city!!)
-
-                    for (room in _rooms) {
-                        rooms[UUID.randomUUID().toString()] = room
-                    }
-
-                    addUserToDataBase()
-                }
-                else {
-                    _rooms.add(city!!)
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        try {
-                            val result = RetrofitInstance.apiPlace.getPlacesDetail(city!!, Url.getApiKey(this@SignUpActivity))
-
-                            _newRooms.add(
-                                Room(name = city, photoRef = result.results[0].photos[0].photo_reference)
-                            )
-
-                            for (room in _rooms) {
-                                rooms[UUID.randomUUID().toString()] = room
+                            for (placeRoom in _placeRooms) {
+                                rooms[UUID.randomUUID().toString()] = placeRoom
                             }
 
-                            addUserToDataBase()
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                addUserToARoom(room, "place")
+                                addUserToDataBase()
+                            }
                         }
-                        catch(e : Exception)  {
-                            Toast.makeText(this@SignUpActivity, "Error while loading place photo : $e", Toast.LENGTH_LONG).show()
+                        else {
+                            addUserToARoom(room, "place")
                         }
                     }
+                    else {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            try {
+                                val result = RetrofitInstance.apiPlace.getPlacesDetail(room, Url.getApiKey(this@SignUpActivity))
+                                _newPlaceRooms.add(
+                                    Room(name = room, photoRef = result.results[0].photos[0].photo_reference, type = "place")
+                                )
 
+                                if (index == _placeRooms.size - 1) {
 
+                                    for (placeRoom in _placeRooms) {
+                                        rooms[UUID.randomUUID().toString()] = placeRoom
+                                    }
+
+                                    addUserToDataBase()
+
+                                }
+                            }
+                            catch(e : Exception)  {
+                                Toast.makeText(this@SignUpActivity, "Error while loading place photo : $e", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
                 }
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Error while accessing database", Toast.LENGTH_LONG).show()
-            }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error while accessing database", Toast.LENGTH_LONG).show()
+                }
+        }
+
     }
 
     private fun addUserToDataBase() {
         val user = User(email, pseudo, rooms.toMap(), imgUrl, latLong)
         // Add user data in real-time database
-        databaseReference.child("users").child(userId).setValue(user)
+        databaseReference.child(FirebaseConst.USERS).child(userId).setValue(user)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     uploadingNewRooms()
@@ -387,14 +423,22 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun uploadingNewRooms() {
         // Add new rooms to database
-        for (room in _newRooms) {
+        for (room in _newPlaceRooms) {
             val newMapOfUser = mapOf(userId to pseudo)
             val newMapOfGrade = mapOf(Grade().name to Grade(users = mapOf(userId to pseudo)))
             room.users = newMapOfUser.toMap()
             room.grades = newMapOfGrade
 
-            //TODO uploading hobby rooms
-            databaseReference.child("rooms").child("place").child(room.name!!).setValue(room)
+            databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PLACE).child(room.name!!).setValue(room)
+        }
+
+        for (room in _newHobbyRooms) {
+            val newMapOfUser = mapOf(userId to pseudo)
+            val newMapOfGrade = mapOf(Grade().name to Grade(users = mapOf(userId to pseudo)))
+            room.users = newMapOfUser.toMap()
+            room.grades = newMapOfGrade
+
+            databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(room.name!!).setValue(room)
         }
 
         val intent = Intent(this, RoomActivity::class.java)

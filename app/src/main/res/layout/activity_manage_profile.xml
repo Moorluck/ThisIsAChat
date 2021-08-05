@@ -16,7 +16,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Modify"
+            android:text="@string/modify"
             android:textColor="@color/lightPurple"
             app:layout_constraintEnd_toEndOf="@+id/btn_sign_out_maage_profile_activity"
             app:layout_constraintStart_toStartOf="@+id/btn_sign_out_maage_profile_activity"
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Pseudo"
+            android:text="@string/pseudo"
             android:textColor="@color/grey"
             app:layout_constraintStart_toStartOf="@+id/et_pseudo_manage_profile_activity"
             app:layout_constraintTop_toBottomOf="@+id/img_profile_manage_profile_activity" />
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Select some of your hobbies :"
+            android:text="@string/select_some_of_your_hobbies"
             android:textColor="@color/grey"
             app:layout_constraintStart_toStartOf="@+id/tv_pseudo_manage_profile_activity"
             app:layout_constraintTop_toBottomOf="@+id/et_pseudo_manage_profile_activity" />
@@ -80,7 +80,7 @@
             android:id="@+id/cb_drawing_manage_profile_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Drawing"
+            android:text="@string/drawing"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_music_manage_profile_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_photography_manage_profile_activity" />
@@ -90,7 +90,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Music"
+            android:text="@string/music"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/et_pseudo_manage_profile_activity"
             app:layout_constraintTop_toBottomOf="@+id/tv_hobbies_manage_profile_activity" />
@@ -99,7 +99,7 @@
             android:id="@+id/cb_photography_manage_profile_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Photography"
+            android:text="@string/photography"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_music_manage_profile_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_travel_manage_profile_activity" />
@@ -108,7 +108,7 @@
             android:id="@+id/cb_video_games_manage_profile_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Video games"
+            android:text="@string/video_games"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_science_manage_profile_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_science_manage_profile_activity" />
@@ -118,7 +118,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Science"
+            android:text="@string/science"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/guideline2"
             app:layout_constraintTop_toBottomOf="@+id/tv_hobbies_manage_profile_activity" />
@@ -127,7 +127,7 @@
             android:id="@+id/cb_travel_manage_profile_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Travelling"
+            android:text="@string/travelling"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_music_manage_profile_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_music_manage_profile_activity" />
@@ -136,7 +136,7 @@
             android:id="@+id/cb_sport_manage_profile_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sports"
+            android:text="@string/sports"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/guideline2"
             app:layout_constraintTop_toBottomOf="@+id/cb_cooking_manage_profile_activity" />
@@ -154,7 +154,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/red"
-            android:text="Sign out"
+            android:text="@string/sign_out"
             android:textColor="@color/lightPurple"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

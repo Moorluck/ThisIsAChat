@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
-            android:text="Sign Up"
+            android:text="@string/sign_up"
             android:textColor="@color/lightPurple"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -56,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Password"
+            android:text="@string/password"
             android:textColor="@color/grey"
             app:layout_constraintStart_toStartOf="@+id/et_e_mail_signup_activity"
             app:layout_constraintTop_toBottomOf="@+id/et_e_mail_signup_activity" />
@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Pseudo"
+            android:text="@string/pseudo"
             android:textColor="@color/grey"
             app:layout_constraintStart_toStartOf="@+id/et_password_signup_activity"
             app:layout_constraintTop_toBottomOf="@+id/et_password_signup_activity" />
@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Select some of your hobbies :"
+            android:text="@string/select_some_of_your_hobbies"
             android:textColor="@color/grey"
             app:layout_constraintStart_toStartOf="@+id/tv_pseudo_signup_activity"
             app:layout_constraintTop_toBottomOf="@+id/et_pseudo_signup_activity" />
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="64dp"
             android:layout_marginTop="16dp"
-            android:text="E-mail"
+            android:text="@string/e_mail"
             android:textColor="@color/grey"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/img_profile_signup_activity" />
@@ -120,7 +120,7 @@
             android:id="@+id/cb_cooking_signup_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cooking"
+            android:text="@string/cooking"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_video_games_signup_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_video_games_signup_activity" />
@@ -129,7 +129,7 @@
             android:id="@+id/cb_drawing_signup_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Drawing"
+            android:text="@string/drawing"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_music_signup_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_photography_signup_activity" />
@@ -139,7 +139,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Music"
+            android:text="@string/music"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/et_pseudo_signup_activity"
             app:layout_constraintTop_toBottomOf="@+id/tv_hobbies_signup_activity2" />
@@ -148,7 +148,7 @@
             android:id="@+id/cb_photography_signup_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Photography"
+            android:text="@string/photography"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_music_signup_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_travel_signup_activity" />
@@ -157,7 +157,7 @@
             android:id="@+id/cb_video_games_signup_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Video games"
+            android:text="@string/video_games"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_science_signup_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_science_signup_activity" />
@@ -167,7 +167,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Science"
+            android:text="@string/science"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/guideline2"
             app:layout_constraintTop_toBottomOf="@+id/tv_hobbies_signup_activity2" />
@@ -176,7 +176,7 @@
             android:id="@+id/cb_travel_signup_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Travelling"
+            android:text="@string/travelling"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_music_signup_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_music_signup_activity" />
@@ -185,7 +185,7 @@
             android:id="@+id/cb_sport_signup_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sports"
+            android:text="@string/sports"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/guideline2"
             app:layout_constraintTop_toBottomOf="@+id/cb_cooking_signup_activity" />
@@ -201,7 +201,7 @@
             android:id="@+id/tv_addpicture_signup_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add a picture"
+            android:text="@string/add_a_picture"
             android:textColor="@color/lightPurple"
             app:layout_constraintBottom_toBottomOf="@+id/img_profile_signup_activity"
             app:layout_constraintEnd_toEndOf="@+id/img_profile_signup_activity"

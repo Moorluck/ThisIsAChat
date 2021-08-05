@@ -20,7 +20,6 @@
         android:layout_marginStart="8dp"
         android:background="@drawable/message_shape_from"
         android:padding="8dp"
-        android:text="Hello !fdfsfsdfdsfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdffdsfsdfsdfsdfsdfsdf"
         android:textColor="@color/lightPurple"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintHorizontal_bias="0.0"

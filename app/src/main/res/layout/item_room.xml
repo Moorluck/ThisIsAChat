@@ -11,6 +11,7 @@
         android:id="@+id/fl_background_item_room"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/mediumGreen"
         android:padding="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout

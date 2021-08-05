@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Password"
+        android:text="@string/password"
         android:textColor="@color/grey"
         app:layout_constraintStart_toStartOf="@+id/et_e_mail_main_activity"
         app:layout_constraintTop_toBottomOf="@+id/et_e_mail_main_activity" />
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginTop="32dp"
-        android:text="E-mail"
+        android:text="@string/e_mail"
         android:textColor="@color/grey"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/img_profile_signup_activity" />
@@ -71,7 +71,7 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Sign In"
+        android:text="@string/sign_in"
         android:textColor="@color/lightPurple"
         app:layout_constraintEnd_toEndOf="@+id/et_password_main_activity"
         app:layout_constraintTop_toBottomOf="@+id/et_password_main_activity" />
@@ -81,7 +81,7 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Sign Up"
+        android:text="@string/sign_up"
         android:backgroundTint="@color/darkGreen"
         android:textColor="@color/lightPurple"
         app:layout_constraintStart_toStartOf="@+id/et_password_main_activity"

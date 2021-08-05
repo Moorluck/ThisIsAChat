@@ -50,14 +50,23 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
         val numberUserMessage = "${room.users.size} / ${room.maxUsers}"
         holder.tvNumberOfUser.text = numberUserMessage
 
+        // Setup the item room background
+        val url = if (room.type == "place") {
+            Url.getPhotoUrl(room.photoRef, 1000, 500, Url.getApiKey(context))
+        }
+        else {
+            room.photoRef
+        }
+
         Glide.with(context)
             .asDrawable()
-            .load(Url.getPhotoUrl(room.photoRef, 1000, 500, Url.getApiKey(context)))
+            .load(url)
             .override(1500, 750)
             .centerCrop()
             .into(object : CustomTarget<Drawable>() {
 
                 override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                    resource.alpha = 210
                     holder.flRoom.background = resource
                 }
 
@@ -68,7 +77,7 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
             })
 
         holder.itemView.setOnClickListener {
-            itemClickListener.onItemClickListener(room.name)
+            itemClickListener.onItemClickListener(room.name, room.type)
         }
 
     }
@@ -78,7 +87,7 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
     }
 
     interface ItemClickListener {
-        fun onItemClickListener(roomName : String?)
+        fun onItemClickListener(roomName : String?, roomType : String?)
     }
 }
 

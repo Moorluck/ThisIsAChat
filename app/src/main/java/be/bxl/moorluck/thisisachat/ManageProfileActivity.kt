@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.models.User
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -56,10 +57,10 @@ class ManageProfileActivity : AppCompatActivity() {
         auth = Firebase.auth
         userFirebase = auth.currentUser
         databaseReference = Firebase
-            .database("https://thisisachat-b0f70-default-rtdb.europe-west1.firebasedatabase.app")
+            .database(FirebaseConst.URL_DATABASE)
             .reference
         storageReference = Firebase
-            .storage("gs://thisisachat-b0f70.appspot.com")
+            .storage(FirebaseConst.URL_STORAGE)
             .reference
 
         // View
@@ -103,7 +104,7 @@ class ManageProfileActivity : AppCompatActivity() {
         supportActionBar?.title = "Manage Profile"
 
         if (userFirebase != null) {
-            databaseReference.child("users").child(userFirebase!!.uid).get()
+            databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).get()
                 .addOnSuccessListener {
                     user = it.getValue(User::class.java)
 

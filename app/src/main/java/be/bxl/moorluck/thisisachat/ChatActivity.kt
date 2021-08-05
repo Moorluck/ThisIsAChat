@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.adapters.ChatAdapter
 import be.bxl.moorluck.thisisachat.api.Url
+import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.fragments.RoomFragment
 import be.bxl.moorluck.thisisachat.models.Message
 import be.bxl.moorluck.thisisachat.models.Room
@@ -54,6 +55,9 @@ class ChatActivity : AppCompatActivity() {
     // Roomname
     lateinit var roomName : String
 
+    //Roomtype
+    lateinit var roomType : String
+
     // User
 
     var userFirebase : FirebaseUser? = null
@@ -72,10 +76,10 @@ class ChatActivity : AppCompatActivity() {
         auth = Firebase.auth
         userFirebase = auth.currentUser
         databaseReference = Firebase
-            .database("https://thisisachat-b0f70-default-rtdb.europe-west1.firebasedatabase.app")
+            .database(FirebaseConst.URL_DATABASE)
             .reference
         storageReference = Firebase
-            .storage("gs://thisisachat-b0f70.appspot.com")
+            .storage(FirebaseConst.URL_STORAGE)
             .reference
 
         // View
@@ -94,8 +98,9 @@ class ChatActivity : AppCompatActivity() {
         linearLayoutManager.stackFromEnd = true
         rvMessage.layoutManager = linearLayoutManager
 
-        // Setup title
+        // Setup title and type
 
+        roomType = intent.getStringExtra(RoomFragment.ROOM_TYPE) ?: ""
         roomName = intent.getStringExtra(RoomFragment.ROOM_NAME) ?: ""
         supportActionBar?.title = roomName
 
@@ -107,40 +112,45 @@ class ChatActivity : AppCompatActivity() {
 
         btnSend.setOnClickListener {
             if (etMessage.text.isNotEmpty()) {
-                databaseReference.child("rooms").child("place").child(roomName).child("messages").push()
+                databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomName).child(FirebaseConst.MESSAGES).push()
                     .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
             }
         }
 
     }
 
-
-
-
     private fun setupBackground() {
-        databaseReference.child("rooms").child("place").child(roomName).child("photoRef").get()
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomName).child(FirebaseConst.PHOTO_REF).get()
             .addOnSuccessListener {
-                Log.d("TAG", it.toString())
-                Glide.with(this)
-                    .asDrawable()
-                    .load(Url.getPhotoUrl(it.value.toString(), 2000, 1000, Url.getApiKey(this)))
-                    .centerCrop()
-                    .into(object : CustomTarget<Drawable>() {
+                    val url = if (roomType == FirebaseConst.PLACE) {
+                        Url.getPhotoUrl(it.value.toString(), 2000, 2000, Url.getApiKey(this))
+                    }
+                    else {
+                        it.value.toString()
+                    }
 
-                        override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                            rvMessage.background = resource
-                        }
+                    Glide.with(this)
+                        .asDrawable()
+                        .load(url)
+                        .fitCenter()
+                        .centerCrop()
+                        .into(object : CustomTarget<Drawable>() {
 
-                        override fun onLoadCleared(placeholder: Drawable?) {
-                        }
+                            override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                resource.alpha = 70
+                                rvMessage.background = resource
+                            }
 
-                    })
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                            }
+
+                        })
             }
     }
 
     private fun getUserInfo() {
         if (userFirebase != null) {
-            databaseReference.child("users").child(userFirebase!!.uid).get()
+            databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).get()
                 .addOnSuccessListener {
                     user = it.getValue(User::class.java)
                 }
@@ -151,7 +161,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun getMessages() {
-        databaseReference.child("rooms").child("place").child(roomName).child("messages")
+        databaseReference.child("rooms").child(roomType).child(roomName).child(FirebaseConst.MESSAGES)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     messages = mutableListOf()

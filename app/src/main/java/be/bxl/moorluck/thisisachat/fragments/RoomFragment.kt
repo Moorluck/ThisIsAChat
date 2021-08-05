@@ -14,6 +14,7 @@ import be.bxl.moorluck.thisisachat.ChatActivity
 import be.bxl.moorluck.thisisachat.NewRoomActivity
 import be.bxl.moorluck.thisisachat.R
 import be.bxl.moorluck.thisisachat.adapters.RoomAdapter
+import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.models.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -32,6 +33,7 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
         fun newInstance() = RoomFragment()
 
         const val ROOM_NAME = "ROOM_NAME"
+        const val ROOM_TYPE = "ROOM_TYPE"
     }
 
     // Fire Base
@@ -50,8 +52,8 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
     // Adapter
 
     private lateinit var roomRegionAdapter : RoomAdapter
-    lateinit var roomHobbyAdapter : RoomAdapter
-    lateinit var roomCustomAdapter : RoomAdapter
+    private lateinit var roomHobbyAdapter : RoomAdapter
+    private lateinit var roomCustomAdapter : RoomAdapter
 
     // Room data
 
@@ -66,10 +68,10 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
         // Firebase
         auth = Firebase.auth
         databaseReference = Firebase
-            .database("https://thisisachat-b0f70-default-rtdb.europe-west1.firebasedatabase.app")
+            .database(FirebaseConst.URL_DATABASE)
             .reference
         storageReference = Firebase
-            .storage("gs://thisisachat-b0f70.appspot.com")
+            .storage(FirebaseConst.URL_STORAGE)
             .reference
 
         // View
@@ -102,13 +104,13 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
     }
 
     private fun getRegionRoom() {
-        databaseReference.child("users").child(auth.currentUser!!.uid).child("rooms").get()
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS).get()
             .addOnSuccessListener { roomList ->
 
                 val listOfRooms : MutableList<Room> = mutableListOf()
 
                 roomList.children.forEach { room ->
-                    databaseReference.child("rooms").child("place").child(room.value.toString()).get()
+                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PLACE).child(room.value.toString()).get()
                         .addOnSuccessListener {
                             if (it.exists()) {
                                 listOfRooms.add(it.getValue(Room::class.java)!!)
@@ -126,13 +128,13 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
     }
 
     private fun getHobbyRoom() {
-        databaseReference.child("users").child(auth.currentUser!!.uid).child("rooms").get()
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS).get()
             .addOnSuccessListener { roomList ->
 
                 val listOfRooms : MutableList<Room> = mutableListOf()
 
                 roomList.children.forEach { room ->
-                    databaseReference.child("rooms").child("hobby").child(room.value.toString()).get()
+                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(room.value.toString()).get()
                         .addOnSuccessListener {
                             if (it.exists()) {
                                 listOfRooms.add(it.getValue(Room::class.java)!!)
@@ -145,13 +147,13 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
     }
 
     private fun getCustomRoom() {
-        databaseReference.child("users").child(auth.currentUser!!.uid).child("rooms").get()
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS).get()
             .addOnSuccessListener { roomList ->
 
                 val listOfRooms : MutableList<Room> = mutableListOf()
 
                 roomList.children.forEach { room ->
-                    databaseReference.child("rooms").child("custom").child(room.value.toString()).get()
+                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.CUSTOM).child(room.value.toString()).get()
                         .addOnSuccessListener {
                             if (it.exists()) {
                                 listOfRooms.add(it.getValue(Room::class.java)!!)
@@ -163,9 +165,10 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
             }
     }
 
-    override fun onItemClickListener(roomName: String?) {
+    override fun onItemClickListener(roomName: String?, roomType : String?) {
         val intent = Intent(activity, ChatActivity::class.java)
         intent.putExtra(ROOM_NAME, roomName)
+        intent.putExtra(ROOM_TYPE, roomType)
         startActivity(intent)
     }
 }
