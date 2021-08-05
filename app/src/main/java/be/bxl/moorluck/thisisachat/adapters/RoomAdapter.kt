@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.R
 import be.bxl.moorluck.thisisachat.api.Url
+import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.models.Room
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -51,7 +52,7 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
         holder.tvNumberOfUser.text = numberUserMessage
 
         // Setup the item room background
-        val url = if (room.type == "place") {
+        val url = if (room.type == FirebaseConst.PLACE) {
             Url.getPhotoUrl(room.photoRef, 1000, 500, Url.getApiKey(context))
         }
         else {

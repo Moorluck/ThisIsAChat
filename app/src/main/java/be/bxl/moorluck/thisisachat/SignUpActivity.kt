@@ -133,6 +133,8 @@ class SignUpActivity : AppCompatActivity() {
 
         imgProfile = findViewById(R.id.img_profile_signup_activity)
 
+        // On click
+
         btnSignUp.setOnClickListener {
 
             email = etEmail.text.toString()
@@ -159,6 +161,8 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
+    // Get place with geocoding api
+
     private fun executeCallToGetPlace() {
         lifecycleScope.launch(Dispatchers.Main) {
             try {
@@ -174,6 +178,8 @@ class SignUpActivity : AppCompatActivity() {
 
         }
     }
+
+    // Add place to rooms
 
     private fun getInitialRoomByPlaces(response : Place) {
 
@@ -195,6 +201,8 @@ class SignUpActivity : AppCompatActivity() {
             Toast.makeText(this@SignUpActivity, "Error generating rooms", Toast.LENGTH_LONG).show()
         }
     }
+
+    // Add hobbies to rooms
 
     private fun getInitialRoomByHobby() {
         if (cbCooking.isChecked) {
@@ -232,6 +240,8 @@ class SignUpActivity : AppCompatActivity() {
         uploadImg()
     }
 
+    // Upload the image
+
     private fun uploadImg() {
         // Upload image then register the user (can't do the opposite)
         if (uri != null) {
@@ -250,6 +260,8 @@ class SignUpActivity : AppCompatActivity() {
                 }
         }
     }
+
+    // Register the user
 
     private fun registerUser() {
 
@@ -272,10 +284,10 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
+    // Add a user when the room already exist
 
     private fun addUserToARoom(roomName : String, type : String) {
 
-        // Add a user when the room already exist
 
         databaseReference.child(FirebaseConst.ROOMS)
             .child(type)
@@ -293,6 +305,8 @@ class SignUpActivity : AppCompatActivity() {
             .child(userId)
             .setValue(pseudo)
     }
+
+    // Generate all the hobby rooms
 
     private fun generateHobbyRooms() {
 
@@ -352,6 +366,8 @@ class SignUpActivity : AppCompatActivity() {
 
     }
 
+    // Generate all the places rooms
+
     private fun generatePlacesRooms() {
         for ((index, room) in _placeRooms.withIndex()) {
 
@@ -404,6 +420,8 @@ class SignUpActivity : AppCompatActivity() {
 
     }
 
+    // Add the user to DB
+
     private fun addUserToDataBase() {
         val user = User(email, pseudo, rooms.toMap(), imgUrl, latLong)
         // Add user data in real-time database
@@ -420,6 +438,8 @@ class SignUpActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error while updating database", Toast.LENGTH_LONG).show()
             }
     }
+
+    // Add new roooms to DB
 
     private fun uploadingNewRooms() {
         // Add new rooms to database

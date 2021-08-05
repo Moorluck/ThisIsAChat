@@ -64,8 +64,6 @@ class ChatAdapter(val context : Context, private val userId : String) : Recycler
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.tvChat.text = messages[position].content
 
-        Log.d("TAG", messages[position].imgProfileRef!!)
-
         if (position == 0 || messages[position-1].userId != messages[position].userId) {
             Glide.with(context)
                 .asDrawable()

@@ -4,6 +4,69 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/darkGreen"
     tools:context=".NewRoomActivity">
 
+    <ImageView
+        android:id="@+id/img_new_room_activity"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/btn_shape" />
+
+    <TextView
+        android:id="@+id/tv_name_room_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:text="Name"
+        android:textColor="@color/lightPurple"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/img_new_room_activity" />
+
+    <EditText
+        android:id="@+id/et_name_room_activity"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="64dp"
+        android:background="@drawable/et_shape"
+        android:ems="10"
+        android:inputType="text"
+        android:padding="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_name_room_activity" />
+
+    <TextView
+        android:id="@+id/tv_add_image_room_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_a_picture"
+        android:textColor="@color/lightPurple"
+        app:layout_constraintBottom_toBottomOf="@+id/img_new_room_activity"
+        app:layout_constraintEnd_toEndOf="@+id/img_new_room_activity"
+        app:layout_constraintStart_toStartOf="@+id/img_new_room_activity"
+        app:layout_constraintTop_toTopOf="@+id/img_new_room_activity" />
+
+    <Button
+        android:id="@+id/btn_create_room_activity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:text="Create"
+        android:textColor="@color/lightPurple"
+        app:layout_constraintEnd_toEndOf="@+id/et_name_room_activity"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/et_name_room_activity"
+        app:layout_constraintTop_toBottomOf="@+id/et_name_room_activity" />
 </androidx.constraintlayout.widget.ConstraintLayout>
