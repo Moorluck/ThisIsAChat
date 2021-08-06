@@ -78,7 +78,7 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
             })
 
         holder.itemView.setOnClickListener {
-            itemClickListener.onItemClickListener(room.name, room.type)
+            itemClickListener.onItemClickListener(room.name, room.type, room.id)
         }
 
     }
@@ -88,7 +88,7 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
     }
 
     interface ItemClickListener {
-        fun onItemClickListener(roomName : String?, roomType : String?)
+        fun onItemClickListener(roomName : String?, roomType : String?, roomId : String?)
     }
 }
 

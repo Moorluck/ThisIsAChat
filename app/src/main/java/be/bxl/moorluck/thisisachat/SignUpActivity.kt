@@ -137,6 +137,8 @@ class SignUpActivity : AppCompatActivity() {
 
         btnSignUp.setOnClickListener {
 
+            btnSignUp.isEnabled = false
+
             email = etEmail.text.toString()
             password = etPassword.text.toString()
             pseudo = etPseudo.text.toString()
@@ -337,7 +339,7 @@ class SignUpActivity : AppCompatActivity() {
                                     //TODO autre photo
                                     val photoRef = "https://firebasestorage.googleapis.com/v0/b/thisisachat-b0f70.appspot.com/o/images%2Fhobby.jpg?alt=media&token=e8eeb7e3-d5b6-40b1-b919-ec54104f8ae4"
                                     _newHobbyRooms.add(
-                                        Room(name = room, photoRef = photoRef, type = "hobby")
+                                        Room(name = room, id = room, photoRef = photoRef, type = "hobby")
                                     )
                                 }
                                 catch(e : Exception)  {
@@ -394,7 +396,7 @@ class SignUpActivity : AppCompatActivity() {
                             try {
                                 val result = RetrofitInstance.apiPlace.getPlacesDetail(room, Url.getApiKey(this@SignUpActivity))
                                 _newPlaceRooms.add(
-                                    Room(name = room, photoRef = result.results[0].photos[0].photo_reference, type = "place")
+                                    Room(name = room, id = room, photoRef = result.results[0].photos[0].photo_reference, type = "place")
                                 )
 
                                 if (index == _placeRooms.size - 1) {

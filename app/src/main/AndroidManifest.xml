@@ -15,7 +15,8 @@
         android:theme="@style/Theme.ThisIsAChat">
         <activity
             android:name=".NewRoomActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth"/>
         <activity
             android:name=".ChatActivity"
             android:exported="true">

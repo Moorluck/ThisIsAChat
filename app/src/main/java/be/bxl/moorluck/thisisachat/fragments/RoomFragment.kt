@@ -34,6 +34,7 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
 
         const val ROOM_NAME = "ROOM_NAME"
         const val ROOM_TYPE = "ROOM_TYPE"
+        const val ROOM_ID = "ROOM_ID"
     }
 
     // Fire Base
@@ -48,6 +49,7 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
     lateinit var rvCustomRoom : RecyclerView
 
     lateinit var btnNewRoom : Button
+    lateinit var btnAddRoom : Button
 
     // Adapter
 
@@ -81,6 +83,7 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
         rvCustomRoom = v.findViewById(R.id.rv_custom_room_fragment)
 
         btnNewRoom = v.findViewById(R.id.btn_new_room_room_fragment)
+        btnAddRoom = v.findViewById(R.id.btn_join_new_room_room_fragment)
 
         // Set up recycler views
         rvRegionRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -90,9 +93,6 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
         roomHobbyAdapter = RoomAdapter(requireContext(), this)
         roomCustomAdapter = RoomAdapter(requireContext(), this)
 
-        getRegionRoom()
-        getHobbyRoom()
-        getCustomRoom()
 
         //Onclick
         btnNewRoom.setOnClickListener {
@@ -100,7 +100,19 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
             startActivity(intent)
         }
 
+        btnAddRoom.setOnClickListener {
+
+        }
+
         return v
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        getRegionRoom()
+        getHobbyRoom()
+        getCustomRoom()
     }
 
     private fun getRegionRoom() {
@@ -165,10 +177,13 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
             }
     }
 
-    override fun onItemClickListener(roomName: String?, roomType : String?) {
+    override fun onItemClickListener(roomName: String?, roomType : String?, roomId : String?) {
         val intent = Intent(activity, ChatActivity::class.java)
         intent.putExtra(ROOM_NAME, roomName)
         intent.putExtra(ROOM_TYPE, roomType)
+        if (roomId != null) {
+            intent.putExtra(ROOM_ID, roomId)
+        }
         startActivity(intent)
     }
 }

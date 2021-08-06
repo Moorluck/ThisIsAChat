@@ -1,7 +1,10 @@
 package be.bxl.moorluck.thisisachat.models
 
+import java.util.*
+
 data class Room (
     val type : String? = null,
+    val id : String? = null,
     val name : String? = null,
     var users : Map<String, String> = mapOf(), // UserID, CustomName
     val photoRef : String = "",

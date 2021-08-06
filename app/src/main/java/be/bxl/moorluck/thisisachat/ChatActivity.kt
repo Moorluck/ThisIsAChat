@@ -52,11 +52,13 @@ class ChatActivity : AppCompatActivity() {
 
     lateinit var chatAdapter : ChatAdapter
 
-    // Roomname
+    // Room info
     lateinit var roomName : String
-
-    //Roomtype
     lateinit var roomType : String
+    private lateinit var roomId : String
+
+    lateinit var roomChildName : String
+
 
     // User
 
@@ -98,11 +100,14 @@ class ChatActivity : AppCompatActivity() {
         linearLayoutManager.stackFromEnd = true
         rvMessage.layoutManager = linearLayoutManager
 
-        // Setup title and type
+        // Get intent and setup title
 
         roomType = intent.getStringExtra(RoomFragment.ROOM_TYPE) ?: ""
         roomName = intent.getStringExtra(RoomFragment.ROOM_NAME) ?: ""
+        roomId = intent.getStringExtra(RoomFragment.ROOM_ID) ?: ""
         supportActionBar?.title = roomName
+
+        // Setup the name of the child
 
         setupBackground()
         getUserInfo()
@@ -112,7 +117,7 @@ class ChatActivity : AppCompatActivity() {
 
         btnSend.setOnClickListener {
             if (etMessage.text.isNotEmpty()) {
-                databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomName).child(FirebaseConst.MESSAGES).push()
+                databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES).push()
                     .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
             }
         }
@@ -120,7 +125,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun setupBackground() {
-        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomName).child(FirebaseConst.PHOTO_REF).get()
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.PHOTO_REF).get()
             .addOnSuccessListener {
                     val url = if (roomType == FirebaseConst.PLACE) {
                         Url.getPhotoUrl(it.value.toString(), 2000, 2000, Url.getApiKey(this))
@@ -161,7 +166,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun getMessages() {
-        databaseReference.child("rooms").child(roomType).child(roomName).child(FirebaseConst.MESSAGES)
+        databaseReference.child("rooms").child(roomType).child(roomId).child(FirebaseConst.MESSAGES)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     messages = mutableListOf()
