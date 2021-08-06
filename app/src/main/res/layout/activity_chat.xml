@@ -16,7 +16,7 @@
         android:background="@android:color/transparent"
         android:ems="10"
         android:hint="@string/enter_a_message"
-        android:inputType="textPersonName"
+        android:inputType="textCapSentences|textMultiLine"
         android:textColor="@color/lightPurple"
         android:textColorHint="@color/grey"
         app:layout_constraintBottom_toBottomOf="parent"

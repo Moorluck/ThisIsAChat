@@ -213,14 +213,31 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
     }
 
     private fun addRoomToUser(roomId: String) {
-        databaseReference.child(FirebaseConst.USERS)
+
+        databaseReference.child(FirebaseConst.ROOMS)
+            .child(FirebaseConst.CUSTOM)
+            .child(roomId)
+            .child(FirebaseConst.USERS)
             .child(auth.currentUser!!.uid)
-            .child(FirebaseConst.ROOMS)
-            .child(UUID.randomUUID().toString())
-            .setValue(roomId)
+            .get()
             .addOnSuccessListener {
-                joinARoom(roomId)
+                if (it.exists()) {
+                    Toast.makeText(requireContext(), "You've already join this room", Toast.LENGTH_LONG).show()
+                }
+
+                else {
+                    databaseReference.child(FirebaseConst.USERS)
+                        .child(auth.currentUser!!.uid)
+                        .child(FirebaseConst.ROOMS)
+                        .child(UUID.randomUUID().toString())
+                        .setValue(roomId)
+                        .addOnSuccessListener {
+                            joinARoom(roomId)
+                        }
+                }
             }
+
+
     }
 
     private fun joinARoom(roomId : String) {

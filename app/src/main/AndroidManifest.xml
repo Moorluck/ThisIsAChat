@@ -14,9 +14,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ThisIsAChat">
         <activity
+            android:name=".ManageRoomActivity"
+            android:exported="true"
+            android:parentActivityName=".ChatActivity"/>
+        <activity
             android:name=".NewRoomActivity"
             android:exported="true"
-            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth"/>
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth" />
         <activity
             android:name=".ChatActivity"
             android:exported="true">

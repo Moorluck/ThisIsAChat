@@ -13,6 +13,7 @@
         <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/activity_chat.xml" value="0.25" />
         <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/activity_main.xml" value="0.29393115942028986" />
         <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/activity_manage_profile.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/activity_manage_room.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/activity_new_room.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/activity_room.xml" value="0.29393115942028986" />
         <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/activity_sign_up.xml" value="0.36666666666666664" />
@@ -22,6 +23,8 @@
         <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/item_message_from.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/item_message_to.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/layout/item_room.xml" value="0.2966485507246377" />
+        <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/menu/chat_menu_action_bar.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/William/AndroidStudioProjects/ThisIsAChat/app/src/main/res/menu/room_menu_action_bar.xml" value="0.36666666666666664" />
       </map>
     </option>
   </component>

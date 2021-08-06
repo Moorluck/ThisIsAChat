@@ -1,11 +1,19 @@
 package be.bxl.moorluck.thisisachat
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.inputmethodservice.Keyboard
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.adapters.ChatAdapter
@@ -32,6 +40,11 @@ import com.google.firebase.storage.ktx.storage
 import java.time.LocalDate
 
 class ChatActivity : AppCompatActivity() {
+
+    companion object {
+        const val ROOM_ID = "ROOM_ID"
+        const val ROOM_TYPE = "ROOM_TYPE"
+    }
 
     //Firebase
 
@@ -116,12 +129,28 @@ class ChatActivity : AppCompatActivity() {
         // OnClick
 
         btnSend.setOnClickListener {
-            if (etMessage.text.isNotEmpty()) {
-                databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES).push()
-                    .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
-            }
+            sendMessage()
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        if (roomType == FirebaseConst.CUSTOM) {
+            menuInflater.inflate(R.menu.chat_menu_action_bar, menu)
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_settings -> {
+                val intent = Intent(this, ManageRoomActivity::class.java)
+                intent.putExtra(ROOM_ID, roomId)
+                intent.putExtra(ROOM_TYPE, roomType)
+                startActivity(intent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun setupBackground() {
@@ -166,7 +195,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun getMessages() {
-        databaseReference.child("rooms").child(roomType).child(roomId).child(FirebaseConst.MESSAGES)
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     messages = mutableListOf()
@@ -182,5 +211,15 @@ class ChatActivity : AppCompatActivity() {
                 }
 
             })
+    }
+
+    private fun sendMessage() {
+        if (etMessage.text.isNotEmpty()) {
+            databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES).push()
+                .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
+
+            // Clear ET
+            etMessage.text.clear()
+        }
     }
 }

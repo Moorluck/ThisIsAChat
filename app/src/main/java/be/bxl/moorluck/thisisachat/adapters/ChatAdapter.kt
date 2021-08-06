@@ -72,6 +72,9 @@ class ChatAdapter(val context : Context, private val userId : String) : Recycler
                 .centerCrop()
                 .into(holder.imgProfile)
         }
+        else {
+            holder.imgProfile.layoutParams.height = 0
+        }
 
     }
 
