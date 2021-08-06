@@ -4,15 +4,72 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/darkGreen"
     tools:context=".ManageRoomActivity">
 
     <TextView
         android:id="@+id/tv_room_id_manage_room_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:layout_marginTop="16dp"
+        android:text="Room Id :"
+        android:textColor="@color/lightPurple"
         android:textIsSelectable="true"
+        app:layout_constraintEnd_toStartOf="@+id/img_copy_id_manage_room_activity"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/img_room_manage_room_activity" />
+
+    <TextView
+        android:id="@+id/tv_name_manage_room_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="32dp"
+        android:text="Name"
+        android:textColor="@color/lightPurple"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_room_id_manage_room_activity" />
+
+    <ImageView
+        android:id="@+id/img_room_manage_room_activity"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/btn_shape" />
+
+    <ImageView
+        android:id="@+id/img_copy_id_manage_room_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:tint="@color/lightPurple"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_room_id_manage_room_activity"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tv_room_id_manage_room_activity"
+        app:layout_constraintTop_toTopOf="@+id/tv_room_id_manage_room_activity"
+        app:srcCompat="@drawable/ic_baseline_content_copy_24" />
+
+    <EditText
+        android:id="@+id/et_name_manage_room_activity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="64dp"
+        android:background="@drawable/et_shape"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:padding="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_name_manage_room_activity" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
