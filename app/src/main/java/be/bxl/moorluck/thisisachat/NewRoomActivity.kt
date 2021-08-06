@@ -29,8 +29,6 @@ class NewRoomActivity : Activity() {
 
     companion object {
         const val REQUEST_CODE = 1
-        const val RESULT_CODE_OK = 2
-        const val RESULT_CODE_FAIL = 3
     }
 
     // Firebase

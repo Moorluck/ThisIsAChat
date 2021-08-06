@@ -1,5 +1,7 @@
 package be.bxl.moorluck.thisisachat.fragments
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.ChatActivity
@@ -15,7 +19,9 @@ import be.bxl.moorluck.thisisachat.NewRoomActivity
 import be.bxl.moorluck.thisisachat.R
 import be.bxl.moorluck.thisisachat.adapters.RoomAdapter
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
+import be.bxl.moorluck.thisisachat.models.Grade
 import be.bxl.moorluck.thisisachat.models.Room
+import be.bxl.moorluck.thisisachat.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
@@ -23,6 +29,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import java.util.*
 
 class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
 
@@ -60,6 +67,10 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
     // Room data
 
     var rooms : MutableList<Room> = mutableListOf()
+
+    // User data
+
+    lateinit var user : User
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -101,18 +112,42 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
         }
 
         btnAddRoom.setOnClickListener {
+            val builder = AlertDialog.Builder(requireActivity())
 
+            val dialogInflater = requireActivity().layoutInflater
+            val view = dialogInflater.inflate(R.layout.dialog_join_room, null)
+
+            builder.setView(view)
+                .setPositiveButton("Join") { dialog, _ ->
+                    val etRoomId : EditText = view.findViewById(R.id.et_room_id_join_dialog)
+                    addRoomToUser(etRoomId.text.toString())
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+            builder.show()
         }
 
         return v
     }
 
+
+
     override fun onResume() {
         super.onResume()
 
+        getUserInfo()
         getRegionRoom()
         getHobbyRoom()
         getCustomRoom()
+    }
+
+    private fun getUserInfo() {
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).get()
+            .addOnSuccessListener {
+                user = it.getValue(User::class.java)!!
+            }
     }
 
     private fun getRegionRoom() {
@@ -174,6 +209,38 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
                             }
                         }
                 }
+            }
+    }
+
+    private fun addRoomToUser(roomId: String) {
+        databaseReference.child(FirebaseConst.USERS)
+            .child(auth.currentUser!!.uid)
+            .child(FirebaseConst.ROOMS)
+            .child(UUID.randomUUID().toString())
+            .setValue(roomId)
+            .addOnSuccessListener {
+                joinARoom(roomId)
+            }
+    }
+
+    private fun joinARoom(roomId : String) {
+        databaseReference.child(FirebaseConst.ROOMS)
+            .child(FirebaseConst.CUSTOM)
+            .child(roomId)
+            .child(FirebaseConst.USERS)
+            .child(auth.currentUser!!.uid)
+            .setValue(user.pseudo)
+
+        databaseReference.child(FirebaseConst.ROOMS)
+            .child(FirebaseConst.CUSTOM)
+            .child(roomId)
+            .child(FirebaseConst.GRADES)
+            .child(Grade().name)
+            .child(FirebaseConst.USERS)
+            .child(auth.currentUser!!.uid)
+            .setValue(user.pseudo)
+            .addOnSuccessListener {
+                getCustomRoom()
             }
     }
 
