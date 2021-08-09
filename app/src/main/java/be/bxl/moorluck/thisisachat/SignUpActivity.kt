@@ -137,7 +137,6 @@ class SignUpActivity : AppCompatActivity() {
 
         btnSignUp.setOnClickListener {
 
-            btnSignUp.isEnabled = false
 
             email = etEmail.text.toString()
             password = etPassword.text.toString()
@@ -146,6 +145,7 @@ class SignUpActivity : AppCompatActivity() {
             if (email.trim() != "" && password.trim() != "" && pseudo.trim() != "") {
                 // Get position then create or join the rooms
                 val locationHelper = LocationHelper(this) { pos ->
+                    btnSignUp.isEnabled = false
                     latLong = pos
                     executeCallToGetPlace()
                 }
