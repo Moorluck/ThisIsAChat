@@ -108,7 +108,12 @@ class ChatActivity : AppCompatActivity() {
 
         // Setup Rv
 
-        chatAdapter = ChatAdapter(this, auth.currentUser!!.uid)
+        val onImageLongClick : (userId : String) -> Unit = {
+            //TODO generate private room
+            Log.d("CLICK", "clicked")
+        }
+
+        chatAdapter = ChatAdapter(this, auth.currentUser!!.uid, onImageLongClick)
         val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         linearLayoutManager.stackFromEnd = true
         rvMessage.layoutManager = linearLayoutManager

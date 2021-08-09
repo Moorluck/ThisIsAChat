@@ -16,7 +16,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 
-class ChatAdapter(val context : Context, private val userId : String) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
+class ChatAdapter(val context : Context, private val userId : String,
+                  private val onLongClickListener : (userId : String) -> Unit) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
 
     companion object {
         const val TYPE_TO = 1
@@ -74,6 +75,16 @@ class ChatAdapter(val context : Context, private val userId : String) : Recycler
         }
         else {
             holder.imgProfile.layoutParams.height = 0
+        }
+
+        holder.imgProfile.setOnLongClickListener {
+            if (messages[position].userId != null) {
+                onLongClickListener(messages[position].userId!!)
+                return@setOnLongClickListener true
+            }
+            else {
+                return@setOnLongClickListener false
+            }
         }
 
     }
