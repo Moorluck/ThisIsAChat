@@ -17,7 +17,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 
 class ChatAdapter(val context : Context, private val userId : String,
-                  private val onLongClickListener : (userId : String) -> Unit) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
+                  private val onLongClickListener : (userId : String, view : View) -> Unit) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
 
     companion object {
         const val TYPE_TO = 1
@@ -79,7 +79,7 @@ class ChatAdapter(val context : Context, private val userId : String,
 
         holder.imgProfile.setOnLongClickListener {
             if (messages[position].userId != null) {
-                onLongClickListener(messages[position].userId!!)
+                onLongClickListener(messages[position].userId!!, it)
                 return@setOnLongClickListener true
             }
             else {

@@ -41,15 +41,21 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
 
         holder.tvRoomName.text = room.name
 
-        //TODO isn't working proprely
-        if (room.messages.isNotEmpty()) {
-            val lastMessage = room.messages.values.toMutableList()[0].pseudo.toString() +
+        if (room.lastMessage != null) {
+            val lastMessage = room.lastMessage.pseudo.toString() +
                     " : " +
-                    room.messages.values.toMutableList()[0].content.toString()
+                    room.lastMessage.content.toString()
             holder.tvLastMessage.text = lastMessage
         }
-        val numberUserMessage = "${room.users.size} / ${room.maxUsers}"
-        holder.tvNumberOfUser.text = numberUserMessage
+
+        if (room.type != FirebaseConst.PRIVATE) {
+            val numberUserMessage = "${room.users.size} / ${room.maxUsers}"
+            holder.tvNumberOfUser.text = numberUserMessage
+        }
+        else {
+            holder.tvNumberOfUser.text = ""
+        }
+
 
         // Setup the item room background
         val url = if (room.type == FirebaseConst.PLACE) {
@@ -59,23 +65,25 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
             room.photoRef
         }
 
-        Glide.with(context)
-            .asDrawable()
-            .load(url)
-            .override(1500, 750)
-            .centerCrop()
-            .into(object : CustomTarget<Drawable>() {
+        if (room.type != FirebaseConst.PRIVATE) {
+            Glide.with(context)
+                .asDrawable()
+                .load(url)
+                .override(1500, 750)
+                .centerCrop()
+                .into(object : CustomTarget<Drawable>() {
 
-                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                    resource.alpha = 210
-                    holder.flRoom.background = resource
-                }
+                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                        resource.alpha = 210
+                        holder.flRoom.background = resource
+                    }
 
-                override fun onLoadCleared(placeholder: Drawable?) {
+                    override fun onLoadCleared(placeholder: Drawable?) {
 
-                }
+                    }
 
-            })
+                })
+        }
 
         holder.itemView.setOnClickListener {
             itemClickListener.onItemClickListener(room.name, room.type, room.id)

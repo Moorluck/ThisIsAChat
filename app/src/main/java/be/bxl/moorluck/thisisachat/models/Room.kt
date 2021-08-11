@@ -9,6 +9,7 @@ data class Room (
     var users : Map<String, String> = mapOf(), // UserID, CustomName
     val photoRef : String = "",
     val messages : Map<String, Message> = mapOf(), // UserID, Content | Attention ! utilisé push pour en faire une liste
+    val lastMessage : Message? = null,
     val maxUsers : Int = 20,
     val shortCuts : Map<String, String> = mapOf(), // Message, Imgurl
     var grades : Map<String, Grade> = mapOf()

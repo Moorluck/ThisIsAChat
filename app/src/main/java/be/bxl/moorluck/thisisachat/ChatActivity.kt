@@ -2,24 +2,18 @@ package be.bxl.moorluck.thisisachat
 
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.inputmethodservice.Keyboard
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
+import android.view.*
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.adapters.ChatAdapter
 import be.bxl.moorluck.thisisachat.api.Url
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
-import be.bxl.moorluck.thisisachat.fragments.RoomFragment
+import be.bxl.moorluck.thisisachat.models.Grade
 import be.bxl.moorluck.thisisachat.models.Message
 import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
@@ -38,10 +32,12 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import java.time.LocalDate
+import java.util.*
 
-class ChatActivity : AppCompatActivity() {
+class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
     companion object {
+        const val ROOM_NAME = "ROOM_NAME"
         const val ROOM_ID = "ROOM_ID"
         const val ROOM_TYPE = "ROOM_TYPE"
     }
@@ -53,6 +49,8 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var storageReference: StorageReference
 
     // View
+
+    lateinit var mainView : View
 
     lateinit var clBackground : ConstraintLayout
 
@@ -77,6 +75,10 @@ class ChatActivity : AppCompatActivity() {
 
     var userFirebase : FirebaseUser? = null
     var user : User? = null
+
+    // Other user
+
+    lateinit var otherUserId : String
 
     // Messages
 
@@ -108,9 +110,11 @@ class ChatActivity : AppCompatActivity() {
 
         // Setup Rv
 
-        val onImageLongClick : (userId : String) -> Unit = {
-            //TODO generate private room
-            Log.d("CLICK", "clicked")
+        val onImageLongClick : (userId : String, view : View) -> Unit = { userId, view ->
+            if (userId != userFirebase!!.uid) {
+                otherUserId = userId
+                showPopUpMenu(view)
+            }
         }
 
         chatAdapter = ChatAdapter(this, auth.currentUser!!.uid, onImageLongClick)
@@ -120,10 +124,10 @@ class ChatActivity : AppCompatActivity() {
 
         // Get intent and setup title
 
-        roomType = intent.getStringExtra(RoomFragment.ROOM_TYPE) ?: ""
-        roomName = intent.getStringExtra(RoomFragment.ROOM_NAME) ?: ""
-        roomId = intent.getStringExtra(RoomFragment.ROOM_ID) ?: ""
-        supportActionBar?.title = roomName
+        roomType = intent.getStringExtra(ROOM_TYPE) ?: ""
+        roomName = intent.getStringExtra(ROOM_NAME) ?: ""
+        roomId = intent.getStringExtra(ROOM_ID) ?: ""
+
 
         // Setup the name of the child
 
@@ -137,6 +141,103 @@ class ChatActivity : AppCompatActivity() {
             sendMessage()
         }
 
+    }
+
+    private fun showPopUpMenu(view : View) {
+        val popup = PopupMenu(this, view)
+        popup.setOnMenuItemClickListener(this)
+        val menuInflater : MenuInflater = popup.menuInflater
+        menuInflater.inflate(R.menu.chat_menu_private_pop_up, popup.menu)
+        popup.show()
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.private_message -> {
+                checkIfPrivateRoomExist(userFirebase!!.uid, otherUserId)
+                true
+            }
+            else -> {
+                false
+            }
+        }
+    }
+
+    private fun checkIfPrivateRoomExist(userId: String, otherUserId: String) {
+        databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(userId + otherUserId).child(FirebaseConst.NAME)
+            .get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    navigateToPrivateRoom(userId + otherUserId, it.value.toString())
+                }
+
+                else {
+                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(otherUserId + userId).child(FirebaseConst.NAME)
+                        .get()
+                        .addOnSuccessListener { room ->
+                            if (room.exists()) {
+                                navigateToPrivateRoom(otherUserId + userId, room.value.toString())
+                            }
+                            else {
+                                createNewPrivateRoom(userId, otherUserId)
+                            }
+                        }
+                }
+            }
+    }
+
+    private fun navigateToPrivateRoom(roomId: String, roomName : String) {
+        val intent = Intent(this, ChatActivity::class.java)
+        intent.putExtra(ROOM_NAME, roomName)
+        intent.putExtra(ROOM_TYPE, FirebaseConst.PRIVATE)
+        intent.putExtra(ROOM_ID, roomId)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun createNewPrivateRoom(userId: String, otherUserId: String) {
+        databaseReference.child(FirebaseConst.USERS).child(otherUserId).child(FirebaseConst.PSEUDO)
+            .get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    val room = Room(
+                        type = FirebaseConst.PRIVATE,
+                        id = userId + otherUserId,
+                        name = "${user!!.pseudo}/${it.value.toString()}",
+                        users = mapOf(userId to user!!.pseudo!!, otherUserId to it.value.toString()),
+                        photoRef = "",
+                        grades = mapOf(Grade().name to Grade(users = mapOf(userId to user!!.pseudo!!, otherUserId to it.value.toString())))
+                    )
+
+                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(room.id!!).setValue(room)
+                        .addOnSuccessListener {
+                            addRoomToUser(room, otherUserId)
+                        }
+                }
+            }
+
+    }
+
+    private fun addRoomToUser(room: Room, otherUserId: String) {
+            databaseReference.child(FirebaseConst.USERS)
+                .child(auth.currentUser!!.uid)
+                .child(FirebaseConst.ROOMS)
+                .child(UUID.randomUUID().toString())
+                .setValue(room.id)
+                .addOnSuccessListener {
+                    addRoomToOtherUser(room, otherUserId)
+                }
+    }
+
+    private fun addRoomToOtherUser(room: Room, otherUserId: String) {
+        databaseReference.child(FirebaseConst.USERS)
+            .child(otherUserId)
+            .child(FirebaseConst.ROOMS)
+            .child(UUID.randomUUID().toString())
+            .setValue(room.id)
+            .addOnSuccessListener {
+                navigateToPrivateRoom(room.id!!, room.name!!)
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -168,6 +269,7 @@ class ChatActivity : AppCompatActivity() {
                         it.value.toString()
                     }
 
+                if (url != "") {
                     Glide.with(this)
                         .asDrawable()
                         .load(url)
@@ -184,6 +286,7 @@ class ChatActivity : AppCompatActivity() {
                             }
 
                         })
+                }
             }
     }
 
@@ -192,6 +295,9 @@ class ChatActivity : AppCompatActivity() {
             databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).get()
                 .addOnSuccessListener {
                     user = it.getValue(User::class.java)
+                    if (roomType == FirebaseConst.PRIVATE) {
+                        supportActionBar?.title = roomName.replace(user!!.pseudo!!, "").replace("/", "")
+                    }
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, "Error while loading user : $it", Toast.LENGTH_LONG).show()
@@ -223,8 +329,13 @@ class ChatActivity : AppCompatActivity() {
             databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES).push()
                 .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
 
+            databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.LAST_MESSAGE)
+                .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
+
             // Clear ET
             etMessage.text.clear()
         }
     }
+
+
 }

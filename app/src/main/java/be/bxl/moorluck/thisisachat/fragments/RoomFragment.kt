@@ -39,10 +39,6 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
     companion object {
         @JvmStatic
         fun newInstance() = RoomFragment()
-
-        const val ROOM_NAME = "ROOM_NAME"
-        const val ROOM_TYPE = "ROOM_TYPE"
-        const val ROOM_ID = "ROOM_ID"
     }
 
     // Fire Base
@@ -265,11 +261,9 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
 
     override fun onItemClickListener(roomName: String?, roomType : String?, roomId : String?) {
         val intent = Intent(activity, ChatActivity::class.java)
-        intent.putExtra(ROOM_NAME, roomName)
-        intent.putExtra(ROOM_TYPE, roomType)
-        if (roomId != null) {
-            intent.putExtra(ROOM_ID, roomId)
-        }
+        intent.putExtra(ChatActivity.ROOM_NAME, roomName)
+        intent.putExtra(ChatActivity.ROOM_TYPE, roomType)
+        intent.putExtra(ChatActivity.ROOM_ID, roomId)
         startActivity(intent)
     }
 }
