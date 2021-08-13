@@ -2,6 +2,7 @@ package be.bxl.moorluck.thisisachat.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.ChatActivity
 import be.bxl.moorluck.thisisachat.R
+import be.bxl.moorluck.thisisachat.adapters.PrivateAdapter
 import be.bxl.moorluck.thisisachat.adapters.RoomAdapter
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.models.Room
@@ -21,7 +23,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 
-class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener {
+class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapter.ItemClickListener {
 
     companion object {
         @JvmStatic
@@ -37,7 +39,11 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener {
     private lateinit var rvRoom : RecyclerView
 
     //Adapter
-    private lateinit var rvAdapter : RoomAdapter
+    private lateinit var rvAdapter : PrivateAdapter
+
+    //ListOfProfileImg
+    var listOfProfileImg : MutableList<String> = mutableListOf()
+    var listOfRooms : MutableList<Room> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,10 +64,9 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener {
 
         // View
 
-        //TODO new adapter
         rvRoom = view.findViewById(R.id.rv_private_fragment)
         rvRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        rvAdapter = RoomAdapter(requireContext(), this)
+        rvAdapter = PrivateAdapter(requireContext(), this)
         rvRoom.adapter = rvAdapter
 
         getPrivateRoom()
@@ -74,17 +79,18 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener {
             FirebaseConst.ROOMS).get()
             .addOnSuccessListener { roomList ->
 
-                val listOfRooms : MutableList<Room> = mutableListOf()
-
                 roomList.children.forEach { room ->
                     databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(room.value.toString()).get()
                         .addOnSuccessListener {
                             if (it.exists()) {
-                                listOfRooms.add(it.getValue(Room::class.java)!!)
+                                val itemRoom = it.getValue(Room::class.java)!!
 
-                                rvAdapter.rooms = listOfRooms
-                                rvRoom.adapter = rvAdapter
-
+                                itemRoom.users.forEach { user ->
+                                    Log.d("USERID", user.key)
+                                    if (user.key != auth.currentUser!!.uid) {
+                                        getProfileImg(user.key, itemRoom)
+                                    }
+                                }
                             }
                         }
                 }
@@ -92,6 +98,19 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener {
             }
 
 
+    }
+
+    private fun getProfileImg(key: String, itemRoom: Room) {
+        databaseReference.child(FirebaseConst.USERS).child(key).child(FirebaseConst.IMG_URL).get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    listOfRooms.add(itemRoom)
+                    listOfProfileImg.add(it.value.toString())
+                    rvAdapter.profileImgs = listOfProfileImg
+                    rvAdapter.rooms = listOfRooms
+                    rvRoom.adapter = rvAdapter
+                }
+            }
     }
 
     override fun onItemClickListener(roomName: String?, roomType: String?, roomId: String?) {

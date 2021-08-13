@@ -118,6 +118,7 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         }
 
         chatAdapter = ChatAdapter(this, auth.currentUser!!.uid, onImageLongClick)
+
         val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         linearLayoutManager.stackFromEnd = true
         rvMessage.layoutManager = linearLayoutManager
