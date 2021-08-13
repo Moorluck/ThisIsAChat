@@ -15,6 +15,7 @@ import be.bxl.moorluck.thisisachat.adapters.PrivateAdapter
 import be.bxl.moorluck.thisisachat.adapters.RoomAdapter
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.models.Room
+import be.bxl.moorluck.thisisachat.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
@@ -79,6 +80,9 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
             FirebaseConst.ROOMS).get()
             .addOnSuccessListener { roomList ->
 
+                listOfRooms = mutableListOf()
+                listOfProfileImg = mutableListOf()
+
                 roomList.children.forEach { room ->
                     databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(room.value.toString()).get()
                         .addOnSuccessListener {
@@ -101,11 +105,14 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
     }
 
     private fun getProfileImg(key: String, itemRoom: Room) {
-        databaseReference.child(FirebaseConst.USERS).child(key).child(FirebaseConst.IMG_URL).get()
+        databaseReference.child(FirebaseConst.USERS).child(key).get()
             .addOnSuccessListener {
                 if (it.exists()) {
+                    val user = it.getValue(User::class.java)
                     listOfRooms.add(itemRoom)
-                    listOfProfileImg.add(it.value.toString())
+                    listOfProfileImg.add(user!!.imgUrl!!)
+
+                    rvAdapter.name = user.pseudo.toString()
                     rvAdapter.profileImgs = listOfProfileImg
                     rvAdapter.rooms = listOfRooms
                     rvRoom.adapter = rvAdapter

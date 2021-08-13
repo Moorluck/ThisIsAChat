@@ -12,10 +12,11 @@ import be.bxl.moorluck.thisisachat.R
 import be.bxl.moorluck.thisisachat.models.Room
 import com.bumptech.glide.Glide
 
-class PrivateAdapter(private val context : Context, private val itemClickListener : PrivateAdapter.ItemClickListener) : RecyclerView.Adapter<PrivateAdapter.ViewHolder>() {
+class PrivateAdapter(private val context : Context, private val itemClickListener : ItemClickListener) : RecyclerView.Adapter<PrivateAdapter.ViewHolder>() {
 
     var rooms : List<Room> = listOf()
     var profileImgs : List<String> = listOf()
+    var name : String = ""
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val imgProfile : ImageView = itemView.findViewById(R.id.img_profile_item_private)
@@ -34,7 +35,7 @@ class PrivateAdapter(private val context : Context, private val itemClickListene
         val room = rooms[position]
         val imgProfile = profileImgs[position]
 
-        holder.tvPseudo.text = room.name
+        holder.tvPseudo.text = name
 
         if (room.messages.isNotEmpty()) {
             val text = room.lastMessage!!.pseudo + " : " + room.lastMessage.content

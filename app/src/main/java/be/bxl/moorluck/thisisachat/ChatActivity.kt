@@ -108,6 +108,10 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         btnSend = findViewById(R.id.btn_send_chat_activity)
         rvMessage = findViewById(R.id.rv_message_chat_activity)
 
+        // Setup the action bar
+
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
         // Setup Rv
 
         val onImageLongClick : (userId : String, view : View) -> Unit = { userId, view ->
@@ -256,6 +260,10 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                 intent.putExtra(ROOM_TYPE, roomType)
                 startActivity(intent)
             }
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -298,6 +306,9 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                     user = it.getValue(User::class.java)
                     if (roomType == FirebaseConst.PRIVATE) {
                         supportActionBar?.title = roomName.replace(user!!.pseudo!!, "").replace("/", "")
+                    }
+                    else {
+                        supportActionBar?.title = roomName
                     }
                 }
                 .addOnFailureListener {

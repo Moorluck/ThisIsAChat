@@ -23,11 +23,9 @@
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth" />
         <activity
             android:name=".ChatActivity"
-            android:exported="true">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".RoomActivity" />
-        </activity>
+            android:exported="true"
+            android:parentActivityName=".RoomActivity"/>
+
         <activity android:name=".ManageProfileActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

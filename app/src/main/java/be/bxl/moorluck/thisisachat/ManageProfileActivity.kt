@@ -26,6 +26,8 @@ class ManageProfileActivity : AppCompatActivity() {
     lateinit var storageReference: StorageReference
 
     // View
+    lateinit var tvId : TextView
+
     lateinit var etPseudo : EditText
 
     lateinit var cbMusic : CheckBox
@@ -64,6 +66,8 @@ class ManageProfileActivity : AppCompatActivity() {
             .reference
 
         // View
+        tvId = findViewById(R.id.tv_id_manage_profile_activity)
+
         etPseudo = findViewById(R.id.et_pseudo_manage_profile_activity)
 
         cbMusic = findViewById(R.id.cb_music_manage_profile_activity)
@@ -79,6 +83,11 @@ class ManageProfileActivity : AppCompatActivity() {
         btnSignOut = findViewById(R.id.btn_sign_out_maage_profile_activity)
 
         imgProfile = findViewById(R.id.img_profile_manage_profile_activity)
+
+        // Set up id
+
+        val idText = "ID : " + userFirebase!!.uid
+        tvId.text = idText
 
         // OnClick
 
