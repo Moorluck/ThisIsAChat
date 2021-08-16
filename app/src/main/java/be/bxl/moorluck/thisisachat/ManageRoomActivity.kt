@@ -1,13 +1,17 @@
 package be.bxl.moorluck.thisisachat
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.ImageDecoder
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.models.Room
 import com.bumptech.glide.Glide
@@ -18,6 +22,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import java.util.*
 
 class ManageRoomActivity : AppCompatActivity() {
 
@@ -25,7 +30,7 @@ class ManageRoomActivity : AppCompatActivity() {
         const val LABEL_COPY = "LABEL_COPY"
     }
 
-    //Firebase
+    // Firebase
 
     lateinit var auth : FirebaseAuth
     lateinit var databaseReference: DatabaseReference
@@ -33,18 +38,36 @@ class ManageRoomActivity : AppCompatActivity() {
 
     // View
 
-    lateinit var tvRoomId : TextView
+    private lateinit var tvRoomId : TextView
 
-    lateinit var etName : EditText
+    private lateinit var etName : EditText
 
-    lateinit var imgCopy : ImageView
-    lateinit var imgRoom : ImageView
+    private lateinit var imgCopy : ImageView
+    private lateinit var imgRoom : ImageView
 
     lateinit var btnModify : Button
 
     // Room info
 
     lateinit var room : Room
+
+    // Uri and imgUrl
+
+    private var uri : Uri? = null
+    private var imgUrl : String = ""
+
+    // Activity for result
+
+    private val getContent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            uri = it.data?.data
+            if (uri != null) {
+                val source = ImageDecoder.createSource(contentResolver, uri!!)
+                val profileDrawable = ImageDecoder.decodeDrawable(source)
+                imgRoom.setImageDrawable(profileDrawable)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +107,12 @@ class ManageRoomActivity : AppCompatActivity() {
 
         // OnClick
 
+        imgRoom.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            getContent.launch(intent)
+        }
+
         imgCopy.setOnClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText(LABEL_COPY, roomId)
@@ -92,19 +121,53 @@ class ManageRoomActivity : AppCompatActivity() {
         }
 
         btnModify.setOnClickListener {
-            updateDB()
+            uploadImg()
         }
 
     }
 
-    private fun updateDB() {
+    private fun uploadImg() {
+        // Upload image then register the user (can't do the opposite)
+        if (uri != null) {
+            val fileName = UUID.randomUUID()
+            val imageRef = storageReference.child("images/$fileName")
+
+            imageRef.putFile(uri!!)
+                .addOnSuccessListener {
+                    imageRef.downloadUrl.addOnSuccessListener {
+                        imgUrl = it.toString()
+                        updateName()
+                    }
+                }
+        }
+        else {
+            updateName()
+        }
+    }
+
+    private fun updateName() {
+
         val newName = etName.text.toString()
 
         databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.CUSTOM).child(room.id!!).child(FirebaseConst.NAME)
             .setValue(newName)
             .addOnSuccessListener {
-                finish()
+                updateImg()
             }
+
+    }
+
+    private fun updateImg() {
+        if (imgUrl != "") {
+            databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.CUSTOM).child(room.id!!).child(FirebaseConst.PHOTO_REF)
+                .setValue(imgUrl)
+                .addOnSuccessListener {
+                    finish()
+                }
+        }
+        else {
+            finish()
+        }
 
     }
 
