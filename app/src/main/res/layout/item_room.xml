@@ -11,12 +11,20 @@
         android:id="@+id/fl_background_item_room"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/mediumGreen"
-        android:padding="10dp">
+        android:scaleType="centerCrop"
+        android:background="@color/mediumGreen">
+
+        <ImageView
+            android:id="@+id/img_background_item_room"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:alpha="0.6"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_margin="10dp">
 
             <TextView
                 android:id="@+id/tv_room_name_item_room"

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.R
@@ -23,6 +24,7 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val flRoom : FrameLayout = itemView.findViewById(R.id.fl_background_item_room)
+        val imgRoom : ImageView = itemView.findViewById(R.id.img_background_item_room)
         val tvRoomName : TextView = itemView.findViewById(R.id.tv_room_name_item_room)
         val tvLastMessage : TextView = itemView.findViewById(R.id.tv_last_message_item_room)
         val tvNumberOfUser : TextView = itemView.findViewById(R.id.tv_number_member_item_room)
@@ -69,20 +71,7 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
             Glide.with(context)
                 .asDrawable()
                 .load(url)
-                .override(1500, 750)
-                .centerCrop()
-                .into(object : CustomTarget<Drawable>() {
-
-                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                        resource.alpha = 210
-                        holder.flRoom.background = resource
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {
-
-                    }
-
-                })
+                .into(holder.imgRoom)
         }
 
         holder.itemView.setOnClickListener {

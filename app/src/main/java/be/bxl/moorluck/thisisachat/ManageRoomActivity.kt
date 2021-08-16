@@ -117,7 +117,7 @@ class ManageRoomActivity : AppCompatActivity() {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText(LABEL_COPY, roomId)
             clipboard.setPrimaryClip(clip)
-            Toast.makeText(this, "Room ID succesfully copied !", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Room ID successfully copied !", Toast.LENGTH_LONG).show()
         }
 
         btnModify.setOnClickListener {

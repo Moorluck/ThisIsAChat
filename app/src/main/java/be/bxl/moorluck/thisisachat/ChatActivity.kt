@@ -50,9 +50,8 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
     // View
 
-    lateinit var mainView : View
-
     lateinit var clBackground : ConstraintLayout
+    lateinit var imgBackground : ImageView
 
     lateinit var etMessage : EditText
     lateinit var imgSendImage : ImageView
@@ -102,6 +101,7 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         // View
 
         clBackground = findViewById(R.id.cl_background_chat_activity)
+        imgBackground = findViewById(R.id.img_background_chat_activity)
 
         etMessage = findViewById(R.id.et_message_chat_activity)
         imgSendImage = findViewById(R.id.img_send_image_chat_activity)
@@ -166,6 +166,86 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
             else -> {
                 false
             }
+        }
+    }
+
+    private fun setupBackground() {
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.PHOTO_REF).get()
+            .addOnSuccessListener {
+                val url = if (roomType == FirebaseConst.PLACE) {
+                    Url.getPhotoUrl(it.value.toString(), 2000, 2000, Url.getApiKey(this))
+                }
+                else {
+                    it.value.toString()
+                }
+
+                if (url != "") {
+                    Glide.with(this)
+                        .asDrawable()
+                        .load(url)
+                        .fitCenter()
+                        .centerCrop()
+                        .into(imgBackground)
+                }
+            }
+    }
+
+    private fun getUserInfo() {
+        if (userFirebase != null) {
+            databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).get()
+                .addOnSuccessListener {
+                    user = it.getValue(User::class.java)
+                    if (roomType == FirebaseConst.PRIVATE) {
+                        getOtherUserName()
+                    }
+                    else {
+                        supportActionBar?.title = roomName
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error while loading user : $it", Toast.LENGTH_LONG).show()
+                }
+        }
+    }
+
+    private fun getOtherUserName() {
+        databaseReference.child(FirebaseConst.USERS).child(roomName.replace(auth.currentUser!!.uid, ""))
+            .child(FirebaseConst.PSEUDO)
+            .get()
+            .addOnSuccessListener {
+                supportActionBar?.title = it.value.toString()
+            }
+    }
+
+    private fun getMessages() {
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    messages = mutableListOf()
+                    snapshot.children.forEach {
+                        messages.add(it.getValue(Message::class.java)!!)
+                    }
+                    chatAdapter.messages = messages
+                    rvMessage.adapter = chatAdapter
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("Firebase", "Failed to connect")
+                }
+
+            })
+    }
+
+    private fun sendMessage() {
+        if (etMessage.text.isNotEmpty()) {
+            databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES).push()
+                .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
+
+            databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.LAST_MESSAGE)
+                .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
+
+            // Clear ET
+            etMessage.text.clear()
         }
     }
 
@@ -269,95 +349,7 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setupBackground() {
-        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.PHOTO_REF).get()
-            .addOnSuccessListener {
-                    val url = if (roomType == FirebaseConst.PLACE) {
-                        Url.getPhotoUrl(it.value.toString(), 2000, 2000, Url.getApiKey(this))
-                    }
-                    else {
-                        it.value.toString()
-                    }
 
-                if (url != "") {
-                    Glide.with(this)
-                        .asDrawable()
-                        .load(url)
-                        .fitCenter()
-                        .centerCrop()
-                        .into(object : CustomTarget<Drawable>() {
-
-                            override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                                resource.alpha = 70
-                                rvMessage.background = resource
-                            }
-
-                            override fun onLoadCleared(placeholder: Drawable?) {
-                            }
-
-                        })
-                }
-            }
-    }
-
-    private fun getUserInfo() {
-        if (userFirebase != null) {
-            databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).get()
-                .addOnSuccessListener {
-                    user = it.getValue(User::class.java)
-                    if (roomType == FirebaseConst.PRIVATE) {
-                        getOtherUserName()
-                    }
-                    else {
-                        supportActionBar?.title = roomName
-                    }
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Error while loading user : $it", Toast.LENGTH_LONG).show()
-                }
-        }
-    }
-
-    private fun getOtherUserName() {
-        databaseReference.child(FirebaseConst.USERS).child(roomName.replace(auth.currentUser!!.uid, ""))
-            .child(FirebaseConst.PSEUDO)
-            .get()
-            .addOnSuccessListener {
-                supportActionBar?.title = it.value.toString()
-            }
-    }
-
-    private fun getMessages() {
-        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    messages = mutableListOf()
-                    snapshot.children.forEach {
-                        messages.add(it.getValue(Message::class.java)!!)
-                    }
-                    chatAdapter.messages = messages
-                    rvMessage.adapter = chatAdapter
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d("Firebase", "Failed to connect")
-                }
-
-            })
-    }
-
-    private fun sendMessage() {
-        if (etMessage.text.isNotEmpty()) {
-            databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES).push()
-                .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
-
-            databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.LAST_MESSAGE)
-                .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
-
-            // Clear ET
-            etMessage.text.clear()
-        }
-    }
 
 
 }
