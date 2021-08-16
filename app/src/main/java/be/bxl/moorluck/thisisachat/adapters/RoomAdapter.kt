@@ -45,12 +45,12 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
         if (room.lastMessage != null) {
             val lastMessage = if (room.lastMessage.content != null) {
                 room.lastMessage.pseudo.toString() +
-                " : " +
-                room.lastMessage.content.toString()
+                        " : " +
+                        room.lastMessage.content.toString()
             }
             else {
                 room.lastMessage.pseudo.toString() +
-                " : img"
+                        " : img"
             }
             holder.tvLastMessage.text = lastMessage
         }

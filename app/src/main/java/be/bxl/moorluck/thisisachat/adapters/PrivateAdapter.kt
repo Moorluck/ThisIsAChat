@@ -37,9 +37,18 @@ class PrivateAdapter(private val context : Context, private val itemClickListene
 
         holder.tvPseudo.text = name
 
-        if (room.messages.isNotEmpty()) {
-            val text = room.lastMessage!!.pseudo + " : " + room.lastMessage.content
-            holder.tvLastMessage.text = text
+        if (room.lastMessage != null) {
+            val lastMessage = if (room.lastMessage.content != null) {
+                room.lastMessage.pseudo +
+                        " : " +
+                        room.lastMessage.content
+            }
+            else {
+                room.lastMessage.pseudo.toString() +
+                        " : img"
+            }
+
+            holder.tvLastMessage.text = lastMessage
         }
 
         Glide.with(context)
