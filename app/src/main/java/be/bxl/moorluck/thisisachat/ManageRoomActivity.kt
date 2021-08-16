@@ -3,13 +3,11 @@ package be.bxl.moorluck.thisisachat
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.models.Room
 import com.bumptech.glide.Glide
@@ -42,6 +40,8 @@ class ManageRoomActivity : AppCompatActivity() {
     lateinit var imgCopy : ImageView
     lateinit var imgRoom : ImageView
 
+    lateinit var btnModify : Button
+
     // Room info
 
     lateinit var room : Room
@@ -69,6 +69,8 @@ class ManageRoomActivity : AppCompatActivity() {
         imgCopy = findViewById(R.id.img_copy_id_manage_room_activity)
         imgRoom = findViewById(R.id.img_room_manage_room_activity)
 
+        btnModify = findViewById(R.id.btn_modify_manage_room_activity)
+
         // Setup the action bar
 
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -86,9 +88,23 @@ class ManageRoomActivity : AppCompatActivity() {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText(LABEL_COPY, roomId)
             clipboard.setPrimaryClip(clip)
-
             Toast.makeText(this, "Room ID succesfully copied !", Toast.LENGTH_LONG).show()
         }
+
+        btnModify.setOnClickListener {
+            updateDB()
+        }
+
+    }
+
+    private fun updateDB() {
+        val newName = etName.text.toString()
+
+        databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.CUSTOM).child(room.id!!).child(FirebaseConst.NAME)
+            .setValue(newName)
+            .addOnSuccessListener {
+                finish()
+            }
 
     }
 
@@ -98,9 +114,7 @@ class ManageRoomActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 if (it.exists()) {
                     room = it.getValue(Room::class.java)!!
-
                     updateUI(room)
-
                 }
             }
     }

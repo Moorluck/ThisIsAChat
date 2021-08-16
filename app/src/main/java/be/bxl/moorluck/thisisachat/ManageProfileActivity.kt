@@ -1,11 +1,17 @@
 package be.bxl.moorluck.thisisachat
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.ImageDecoder
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
+import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -16,38 +22,53 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import java.util.*
 
 class ManageProfileActivity : AppCompatActivity() {
 
     //Firebase
 
-    lateinit var auth : FirebaseAuth
-    lateinit var databaseReference: DatabaseReference
-    lateinit var storageReference: StorageReference
+    private lateinit var auth : FirebaseAuth
+    private lateinit var databaseReference: DatabaseReference
+    private lateinit var storageReference: StorageReference
 
     // View
-    lateinit var tvId : TextView
-
-    lateinit var etPseudo : EditText
-
-    lateinit var cbMusic : CheckBox
-    lateinit var cbTravelling : CheckBox
-    lateinit var cbPhotography : CheckBox
-    lateinit var cbDrawing : CheckBox
-    lateinit var cbScience : CheckBox
-    lateinit var cbVideoGames : CheckBox
-    lateinit var cbCooking : CheckBox
-    lateinit var cbSport : CheckBox
-
-    lateinit var btnModify : Button
-    lateinit var btnSignOut : Button
-
-    lateinit var imgProfile : ImageView
+    private lateinit var tvId : TextView
+    private lateinit var etPseudo : EditText
+    private lateinit var cbMusic : CheckBox
+    private lateinit var cbTravelling : CheckBox
+    private lateinit var cbPhotography : CheckBox
+    private lateinit var cbDrawing : CheckBox
+    private lateinit var cbScience : CheckBox
+    private lateinit var cbVideoGames : CheckBox
+    private lateinit var cbCooking : CheckBox
+    private lateinit var cbSport : CheckBox
+    private lateinit var btnModify : Button
+    private lateinit var btnSignOut : Button
+    private lateinit var imgProfile : ImageView
 
     // User
 
-    var userFirebase : FirebaseUser? = null
-    var user : User? = null
+    private var userFirebase : FirebaseUser? = null
+    private var user : User? = null
+
+    // Uri and imgurl
+
+    private var uri : Uri? = null
+    private var imgUrl : String = ""
+
+    // Activity for result
+
+    private val getContent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            uri = it.data?.data
+            if (uri != null) {
+                val source = ImageDecoder.createSource(contentResolver, uri!!)
+                val profileDrawable = ImageDecoder.decodeDrawable(source)
+                imgProfile.setImageDrawable(profileDrawable)
+            }
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,16 +110,18 @@ class ManageProfileActivity : AppCompatActivity() {
         val idText = "ID : " + userFirebase!!.uid
         tvId.text = idText
 
+        setupCheckBoxes()
+
         // OnClick
 
         btnModify.setOnClickListener {
-            //TODO gestion modification du pseudo
-            return@setOnClickListener
+            uploadImg()
         }
 
         imgProfile.setOnClickListener {
-            //TODO gestion suppression et ajout d'image
-            return@setOnClickListener
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            getContent.launch(intent)
         }
 
         btnSignOut.setOnClickListener {
@@ -123,6 +146,88 @@ class ManageProfileActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error while loading user : $it", Toast.LENGTH_LONG).show()
                 }
         }
+    }
+
+    private fun uploadImg() {
+        // Upload image then register the user (can't do the opposite)
+        if (uri != null) {
+            val fileName = UUID.randomUUID()
+            val imageRef = storageReference.child("images/$fileName")
+
+            imageRef.putFile(uri!!)
+                .addOnSuccessListener {
+                    imageRef.downloadUrl.addOnSuccessListener {
+                        imgUrl = it.toString()
+                        updatePseudo()
+                    }
+                }
+        }
+        else {
+            updatePseudo()
+        }
+    }
+
+    private fun updatePseudo() {
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.PSEUDO)
+            .setValue(etPseudo.text.toString())
+            .addOnSuccessListener {
+                updateImgUrl()
+            }
+    }
+
+    private fun updateImgUrl() {
+        if (imgUrl != "") {
+            databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.IMG_URL)
+                .setValue(imgUrl)
+                .addOnSuccessListener {
+                    finish()
+                }
+        }
+        else {
+            finish()
+        }
+    }
+
+    private fun setupCheckBoxes() {
+        databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).child(FirebaseConst.ROOMS)
+            .get()
+            .addOnSuccessListener { roomList ->
+                roomList.children.forEach {
+                    val roomId = it.value
+
+                    if (roomId == getString(R.string.music)) {
+                        cbMusic.isChecked = true
+                    }
+
+                    if (roomId == getString(R.string.travelling)) {
+                        cbTravelling.isChecked = true
+                    }
+
+                    if (roomId == getString(R.string.photography)) {
+                        cbPhotography.isChecked = true
+                    }
+
+                    if (roomId == getString(R.string.drawing)) {
+                        cbDrawing.isChecked = true
+                    }
+
+                    if (roomId == getString(R.string.science)) {
+                        cbScience.isChecked = true
+                    }
+
+                    if (roomId == getString(R.string.video_games)) {
+                        cbVideoGames.isChecked = true
+                    }
+
+                    if (roomId == getString(R.string.cooking)) {
+                        cbCooking.isChecked = true
+                    }
+
+                    if (roomId == getString(R.string.sports)) {
+                        cbSport.isChecked = true
+                    }
+                }
+            }
     }
 
     private fun updateUI() {

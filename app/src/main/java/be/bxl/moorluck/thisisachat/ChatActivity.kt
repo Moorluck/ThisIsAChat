@@ -133,19 +133,20 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         roomName = intent.getStringExtra(ROOM_NAME) ?: ""
         roomId = intent.getStringExtra(ROOM_ID) ?: ""
 
-
-        // Setup the name of the child
-
-        setupBackground()
-        getUserInfo()
-        getMessages()
-
         // OnClick
 
         btnSend.setOnClickListener {
             sendMessage()
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        setupBackground()
+        getUserInfo()
+        getMessages()
     }
 
     private fun showPopUpMenu(view : View) {
@@ -208,7 +209,7 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                     val room = Room(
                         type = FirebaseConst.PRIVATE,
                         id = userId + otherUserId,
-                        name = "${user!!.pseudo}/${it.value.toString()}",
+                        name = userId + otherUserId,
                         users = mapOf(userId to user!!.pseudo!!, otherUserId to it.value.toString()),
                         photoRef = "",
                         grades = mapOf(Grade().name to Grade(users = mapOf(userId to user!!.pseudo!!, otherUserId to it.value.toString())))
@@ -305,7 +306,7 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                 .addOnSuccessListener {
                     user = it.getValue(User::class.java)
                     if (roomType == FirebaseConst.PRIVATE) {
-                        supportActionBar?.title = roomName.replace(user!!.pseudo!!, "").replace("/", "")
+                        getOtherUserName()
                     }
                     else {
                         supportActionBar?.title = roomName
@@ -315,6 +316,15 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                     Toast.makeText(this, "Error while loading user : $it", Toast.LENGTH_LONG).show()
                 }
         }
+    }
+
+    private fun getOtherUserName() {
+        databaseReference.child(FirebaseConst.USERS).child(roomName.replace(auth.currentUser!!.uid, ""))
+            .child(FirebaseConst.PSEUDO)
+            .get()
+            .addOnSuccessListener {
+                supportActionBar?.title = it.value.toString()
+            }
     }
 
     private fun getMessages() {

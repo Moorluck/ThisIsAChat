@@ -48,12 +48,12 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
 
     // View
 
-    lateinit var rvRegionRoom : RecyclerView
-    lateinit var rvHobbyRoom : RecyclerView
-    lateinit var rvCustomRoom : RecyclerView
+    private lateinit var rvRegionRoom : RecyclerView
+    private lateinit var rvHobbyRoom : RecyclerView
+    private lateinit var rvCustomRoom : RecyclerView
 
-    lateinit var btnNewRoom : Button
-    lateinit var btnAddRoom : Button
+    private lateinit var btnNewRoom : Button
+    private lateinit var btnAddRoom : Button
 
     // Adapter
 
