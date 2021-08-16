@@ -71,8 +71,6 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
     lateinit var roomType : String
     private lateinit var roomId : String
 
-    lateinit var roomChildName : String
-
 
     // User
 
@@ -97,7 +95,6 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         if (it.resultCode == Activity.RESULT_OK) {
             uri = it.data?.data
             if (uri != null) {
-                val source = ImageDecoder.createSource(contentResolver, uri!!)
                 uploadImage()
             }
         }
