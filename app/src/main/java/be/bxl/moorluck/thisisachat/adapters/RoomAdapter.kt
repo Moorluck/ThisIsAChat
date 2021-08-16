@@ -23,7 +23,6 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
     var rooms : List<Room> = listOf()
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
-        val flRoom : FrameLayout = itemView.findViewById(R.id.fl_background_item_room)
         val imgRoom : ImageView = itemView.findViewById(R.id.img_background_item_room)
         val tvRoomName : TextView = itemView.findViewById(R.id.tv_room_name_item_room)
         val tvLastMessage : TextView = itemView.findViewById(R.id.tv_last_message_item_room)
@@ -44,9 +43,15 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
         holder.tvRoomName.text = room.name
 
         if (room.lastMessage != null) {
-            val lastMessage = room.lastMessage.pseudo.toString() +
-                    " : " +
-                    room.lastMessage.content.toString()
+            val lastMessage = if (room.lastMessage.content != null) {
+                room.lastMessage.pseudo.toString() +
+                " : " +
+                room.lastMessage.content.toString()
+            }
+            else {
+                room.lastMessage.pseudo.toString() +
+                " : img"
+            }
             holder.tvLastMessage.text = lastMessage
         }
 

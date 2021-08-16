@@ -7,5 +7,6 @@ data class Message (
     val pseudo : String? = null,
     val imgProfileRef : String? = null,
     val date : String? = null,
-    val content : String? = null
+    val content : String? = null,
+    val imgContent : String? = null
 )

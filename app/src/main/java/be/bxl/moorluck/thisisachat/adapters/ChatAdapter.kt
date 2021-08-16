@@ -14,6 +14,7 @@ import be.bxl.moorluck.thisisachat.api.Url
 import be.bxl.moorluck.thisisachat.models.Message
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 
 class ChatAdapter(val context : Context, private val userId : String,
@@ -29,6 +30,7 @@ class ChatAdapter(val context : Context, private val userId : String,
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
 
         val tvChat : TextView = itemView.findViewById(R.id.tv_item_message)
+        val imgContent : ImageView = itemView.findViewById(R.id.img_message_item_message)
         val imgProfile : ImageView = itemView.findViewById(R.id.img_profile_item_message)
 
     }
@@ -63,7 +65,19 @@ class ChatAdapter(val context : Context, private val userId : String,
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.tvChat.text = messages[position].content
+
+        if (messages[position].content != null) {
+            holder.tvChat.text = messages[position].content
+        }
+
+        if (messages[position].imgContent != null) {
+            Glide.with(context)
+                .asDrawable()
+                .load(messages[position].imgContent)
+                .fitCenter()
+                .into(holder.imgContent)
+        }
+
 
         if (position == 0 || messages[position-1].userId != messages[position].userId) {
             Glide.with(context)

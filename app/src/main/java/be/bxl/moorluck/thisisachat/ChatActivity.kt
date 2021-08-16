@@ -1,12 +1,16 @@
 package be.bxl.moorluck.thisisachat
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -83,6 +87,25 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
     var messages : MutableList<Message> = mutableListOf()
 
+    // Uri and url
+    private var uri : Uri? = null
+    private var imgUrl : String =""
+
+    // Activity for result
+
+    private val getContent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            uri = it.data?.data
+            if (uri != null) {
+                val source = ImageDecoder.createSource(contentResolver, uri!!)
+                uploadImage()
+            }
+        }
+    }
+
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
@@ -137,6 +160,12 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
         btnSend.setOnClickListener {
             sendMessage()
+        }
+
+        imgSendImage.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            getContent.launch(intent)
         }
 
     }
@@ -247,6 +276,29 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
             // Clear ET
             etMessage.text.clear()
         }
+    }
+
+    private fun uploadImage() {
+        if (uri != null) {
+            val fileName = UUID.randomUUID()
+            val imageRef = storageReference.child("images/$fileName")
+
+            imageRef.putFile(uri!!)
+                .addOnSuccessListener {
+                    imageRef.downloadUrl.addOnSuccessListener {
+                        imgUrl = it.toString()
+                        sendImage(imgUrl)
+                    }
+                }
+        }
+    }
+
+    private fun sendImage(imgUrl: String) {
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES).push()
+            .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), imgContent = imgUrl))
+
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.LAST_MESSAGE)
+            .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), imgContent = imgUrl))
     }
 
     private fun checkIfPrivateRoomExist(userId: String, otherUserId: String) {
