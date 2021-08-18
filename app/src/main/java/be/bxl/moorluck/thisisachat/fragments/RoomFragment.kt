@@ -1,11 +1,8 @@
 package be.bxl.moorluck.thisisachat.fragments
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +22,10 @@ import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
@@ -136,9 +136,9 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
         super.onResume()
 
         getUserInfo()
-        getRegionRoom()
-        getHobbyRoom()
-        getCustomRoom()
+        getRoom(FirebaseConst.PLACE, roomRegionAdapter, rvRegionRoom)
+        getRoom(FirebaseConst.HOBBY, roomHobbyAdapter, rvHobbyRoom)
+        getRoom(FirebaseConst.CUSTOM, roomCustomAdapter, rvCustomRoom)
     }
 
     private fun getUserInfo() {
@@ -148,66 +148,35 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
             }
     }
 
-    private fun getRegionRoom() {
+    private fun getRoom(type: String, roomAdapter: RoomAdapter, rvRoom: RecyclerView) {
         databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS).get()
             .addOnSuccessListener { roomList ->
 
-                val listOfRooms : MutableList<Room> = mutableListOf()
+                val mapOfRoom : MutableMap<String, Room> = mutableMapOf()
 
                 roomList.children.forEach { room ->
-                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PLACE).child(room.value.toString()).get()
-                        .addOnSuccessListener {
-                            if (it.exists()) {
-                                listOfRooms.add(it.getValue(Room::class.java)!!)
+                    databaseReference.child(FirebaseConst.ROOMS).child(type).child(room.value.toString())
+                        .addValueEventListener(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    mapOfRoom[snapshot.getValue(Room::class.java)!!.id!!] = snapshot.getValue(Room::class.java)!!
+                                    roomAdapter.rooms = mapOfRoom.values.toList()
+                                    rvRoom.adapter = roomAdapter
+                                }
+                            }
 
-                                roomRegionAdapter.rooms = listOfRooms
-                                rvRegionRoom.adapter = roomRegionAdapter
+                            override fun onCancelled(error: DatabaseError) {
 
                             }
-                        }
+
+                        })
+
+
                 }
 
             }
 
 
-    }
-
-    private fun getHobbyRoom() {
-        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS).get()
-            .addOnSuccessListener { roomList ->
-
-                val listOfRooms : MutableList<Room> = mutableListOf()
-
-                roomList.children.forEach { room ->
-                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(room.value.toString()).get()
-                        .addOnSuccessListener {
-                            if (it.exists()) {
-                                listOfRooms.add(it.getValue(Room::class.java)!!)
-                                roomHobbyAdapter.rooms = listOfRooms
-                                rvHobbyRoom.adapter = roomHobbyAdapter
-                            }
-                        }
-                }
-            }
-    }
-
-    private fun getCustomRoom() {
-        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS).get()
-            .addOnSuccessListener { roomList ->
-
-                val listOfRooms : MutableList<Room> = mutableListOf()
-
-                roomList.children.forEach { room ->
-                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.CUSTOM).child(room.value.toString()).get()
-                        .addOnSuccessListener {
-                            if (it.exists()) {
-                                listOfRooms.add(it.getValue(Room::class.java)!!)
-                                roomCustomAdapter.rooms = listOfRooms
-                                rvCustomRoom.adapter = roomCustomAdapter
-                            }
-                        }
-                }
-            }
     }
 
     private fun addRoomToUser(roomId: String) {
@@ -255,7 +224,7 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
             .child(auth.currentUser!!.uid)
             .setValue(user.pseudo)
             .addOnSuccessListener {
-                getCustomRoom()
+                getRoom(FirebaseConst.CUSTOM, roomCustomAdapter, rvCustomRoom)
             }
     }
 
