@@ -9,11 +9,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.R
 import be.bxl.moorluck.thisisachat.models.Room
+import be.bxl.moorluck.thisisachat.models.User
 import com.bumptech.glide.Glide
 
 class PrivateAdapter(private val context : Context, private val itemClickListener : ItemClickListener) : RecyclerView.Adapter<PrivateAdapter.ViewHolder>() {
 
     var rooms : List<Room> = listOf()
+    var users : List<User> = listOf()
     var profileImgs : List<String> = listOf()
     var names : List<String> = listOf()
 

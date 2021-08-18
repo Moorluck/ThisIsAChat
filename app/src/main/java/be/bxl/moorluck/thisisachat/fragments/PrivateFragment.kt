@@ -22,7 +22,10 @@ import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
@@ -53,9 +56,11 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
     private lateinit var user : User
 
     //ListOfProfileImg
-    var listOfProfileImg : MutableList<String> = mutableListOf()
-    var listOfRooms : MutableList<Room> = mutableListOf()
-    var listOfNames : MutableList<String> = mutableListOf()
+    var mapOfProfileImage : MutableMap<String, String> = mutableMapOf()
+    var mapOfRooms : MutableMap<String, Room> = mutableMapOf()
+    var mapOfNames : MutableMap<String, String> = mutableMapOf()
+
+    var mapOfUsersAndRoom : MutableMap<User, Room> = mutableMapOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -190,11 +195,31 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
             FirebaseConst.ROOMS).get()
             .addOnSuccessListener { roomList ->
 
-                listOfRooms = mutableListOf()
-                listOfProfileImg = mutableListOf()
-                listOfNames = mutableListOf()
+                mapOfRooms = mutableMapOf()
+                mapOfProfileImage = mutableMapOf()
+                mapOfNames = mutableMapOf()
 
                 roomList.children.forEach { room ->
+                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(room.value.toString())
+                        .addValueEventListener(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    val itemRoom = snapshot.getValue(Room::class.java)!!
+
+                                    itemRoom.users.forEach { user ->
+                                        if (user.key != auth.currentUser!!.uid) {
+                                            getItemInfo(user.key, itemRoom)
+                                        }
+                                    }
+
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+
+                            }
+
+                        })
                     databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(room.value.toString()).get()
                         .addOnSuccessListener {
                             if (it.exists()) {
@@ -202,7 +227,7 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
 
                                 itemRoom.users.forEach { user ->
                                     if (user.key != auth.currentUser!!.uid) {
-                                        getProfileImg(user.key, itemRoom)
+                                        getItemInfo(user.key, itemRoom)
                                     }
                                 }
                             }
@@ -214,18 +239,29 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
 
     }
 
-    private fun getProfileImg(key: String, itemRoom: Room) {
+    private fun getItemInfo(key: String, itemRoom: Room) {
         databaseReference.child(FirebaseConst.USERS).child(key).get()
             .addOnSuccessListener {
+
                 if (it.exists()) {
                     val user = it.getValue(User::class.java)
-                    listOfRooms.add(itemRoom)
-                    listOfProfileImg.add(user!!.imgUrl!!)
-                    listOfNames.add(user.pseudo.toString())
 
-                    rvAdapter.names = listOfNames
-                    rvAdapter.profileImgs = listOfProfileImg
-                    rvAdapter.rooms = listOfRooms
+                    if (user != null) {
+                        mapOfUsersAndRoom[user] = itemRoom
+                    }
+
+                    for (element in mapOfUsersAndRoom) {
+                        val user = element.key
+                        val room = element.value
+
+                        mapOfNames[user.email!!] = user.pseudo!!
+                        mapOfProfileImage[user.email] = user.imgUrl!!
+                        mapOfRooms[room.id!!] = room
+                    }
+
+                    rvAdapter.names = mapOfNames.values.toList()
+                    rvAdapter.profileImgs = mapOfProfileImage.values.toList()
+                    rvAdapter.rooms = mapOfRooms.values.toList()
                     rvRoom.adapter = rvAdapter
                 }
             }
