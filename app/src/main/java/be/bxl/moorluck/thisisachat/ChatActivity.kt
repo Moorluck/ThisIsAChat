@@ -390,6 +390,7 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                 intent.putExtra(ROOM_TYPE, roomType)
                 startActivity(intent)
             }
+
             android.R.id.home -> {
                 onBackPressed()
                 return true
@@ -397,8 +398,4 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         }
         return super.onOptionsItemSelected(item)
     }
-
-
-
-
 }

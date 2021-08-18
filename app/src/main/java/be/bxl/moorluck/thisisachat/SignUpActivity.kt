@@ -29,6 +29,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 import java.util.*
 
@@ -282,6 +283,7 @@ class SignUpActivity : AppCompatActivity() {
                 }
                 else {
                     Toast.makeText(this, "Error while signing up ${it.exception}", Toast.LENGTH_LONG).show()
+                    btnSignUp.isEnabled = true
                 }
         }
     }
@@ -336,8 +338,7 @@ class SignUpActivity : AppCompatActivity() {
                         else {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 try {
-                                    //TODO autre photo
-                                    val photoRef = "https://firebasestorage.googleapis.com/v0/b/thisisachat-b0f70.appspot.com/o/images%2Fhobby.jpg?alt=media&token=e8eeb7e3-d5b6-40b1-b919-ec54104f8ae4"
+                                    val photoRef = "https://firebasestorage.googleapis.com/v0/b/thisisachat-b0f70.appspot.com/o/images%2Fhobby.jpg?alt=media&token=08b97907-2d3a-43c4-a200-d0d821e9dfab"
                                     _newHobbyRooms.add(
                                         Room(name = room, id = room, photoRef = photoRef, type = "hobby")
                                     )
@@ -392,26 +393,32 @@ class SignUpActivity : AppCompatActivity() {
                         }
                     }
                     else {
-                        lifecycleScope.launch(Dispatchers.Main) {
+                        runBlocking {
                             try {
                                 val result = RetrofitInstance.apiPlace.getPlacesDetail(room, Url.getApiKey(this@SignUpActivity))
+
                                 _newPlaceRooms.add(
                                     Room(name = room, id = room, photoRef = result.results[0].photos[0].photo_reference, type = "place")
                                 )
-
-                                if (index == _placeRooms.size - 1) {
-
-                                    for (placeRoom in _placeRooms) {
-                                        rooms[UUID.randomUUID().toString()] = placeRoom
-                                    }
-
-                                    addUserToDataBase()
-
-                                }
                             }
                             catch(e : Exception)  {
+
+                                _newPlaceRooms.add(
+                                    Room(name = room, id = room, photoRef = "", type = "place")
+                                )
+
                                 Toast.makeText(this@SignUpActivity, "Error while loading place photo : $e", Toast.LENGTH_LONG).show()
                             }
+                        }
+
+                        if (index == _placeRooms.size - 1) {
+
+                            for (placeRoom in _placeRooms) {
+                                rooms[UUID.randomUUID().toString()] = placeRoom
+                            }
+
+                            addUserToDataBase()
+
                         }
                     }
                 }
@@ -451,7 +458,10 @@ class SignUpActivity : AppCompatActivity() {
             room.users = newMapOfUser.toMap()
             room.grades = newMapOfGrade
 
-            databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PLACE).child(room.name!!).setValue(room)
+            runBlocking {
+                databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PLACE)
+                    .child(room.name!!).setValue(room)
+            }
         }
 
         for (room in _newHobbyRooms) {
@@ -460,13 +470,15 @@ class SignUpActivity : AppCompatActivity() {
             room.users = newMapOfUser.toMap()
             room.grades = newMapOfGrade
 
-            databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(room.name!!).setValue(room)
+            runBlocking {
+                databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY)
+                    .child(room.name!!).setValue(room)
+            }
         }
 
         val intent = Intent(this, RoomActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
-        finish()
     }
 
 
