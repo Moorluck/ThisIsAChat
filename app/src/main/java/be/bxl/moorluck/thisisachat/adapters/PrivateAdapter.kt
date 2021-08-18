@@ -15,7 +15,7 @@ class PrivateAdapter(private val context : Context, private val itemClickListene
 
     var rooms : List<Room> = listOf()
     var profileImgs : List<String> = listOf()
-    var name : String = ""
+    var names : List<String> = listOf()
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val imgProfile : ImageView = itemView.findViewById(R.id.img_profile_item_private)
@@ -34,7 +34,7 @@ class PrivateAdapter(private val context : Context, private val itemClickListene
         val room = rooms[position]
         val imgProfile = profileImgs[position]
 
-        holder.tvPseudo.text = name
+        holder.tvPseudo.text = names[position]
 
         if (room.lastMessage != null) {
             val lastMessage = if (room.lastMessage.content != null) {

@@ -55,6 +55,7 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
     //ListOfProfileImg
     var listOfProfileImg : MutableList<String> = mutableListOf()
     var listOfRooms : MutableList<Room> = mutableListOf()
+    var listOfNames : MutableList<String> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -115,8 +116,6 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
                 }
             }
     }
-
-    //TODO check if room exist
 
     private fun checkIfPrivateRoomExist(userId: String, otherUserId: String) {
         databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(userId + otherUserId).child(FirebaseConst.NAME)
@@ -193,6 +192,7 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
 
                 listOfRooms = mutableListOf()
                 listOfProfileImg = mutableListOf()
+                listOfNames = mutableListOf()
 
                 roomList.children.forEach { room ->
                     databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(room.value.toString()).get()
@@ -221,8 +221,9 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
                     val user = it.getValue(User::class.java)
                     listOfRooms.add(itemRoom)
                     listOfProfileImg.add(user!!.imgUrl!!)
+                    listOfNames.add(user.pseudo.toString())
 
-                    rvAdapter.name = user.pseudo.toString()
+                    rvAdapter.names = listOfNames
                     rvAdapter.profileImgs = listOfProfileImg
                     rvAdapter.rooms = listOfRooms
                     rvRoom.adapter = rvAdapter
