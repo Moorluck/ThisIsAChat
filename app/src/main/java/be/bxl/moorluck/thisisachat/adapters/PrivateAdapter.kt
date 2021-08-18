@@ -37,6 +37,7 @@ class PrivateAdapter(private val context : Context, private val itemClickListene
         holder.tvPseudo.text = names[position]
 
         if (room.lastMessage != null) {
+            holder.tvLastMessage.visibility = View.VISIBLE
             val lastMessage = if (room.lastMessage.content != null) {
                 room.lastMessage.pseudo +
                         " : " +
@@ -48,6 +49,9 @@ class PrivateAdapter(private val context : Context, private val itemClickListene
             }
 
             holder.tvLastMessage.text = lastMessage
+        }
+        else {
+            holder.tvLastMessage.visibility = View.INVISIBLE
         }
 
         Glide.with(context)

@@ -14,9 +14,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ThisIsAChat">
         <activity
+            android:name=".SearchMessageActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth"/>
+        <activity
             android:name=".ManageRoomActivity"
             android:exported="true"
-            android:parentActivityName=".ChatActivity"/>
+            android:parentActivityName=".ChatActivity" />
         <activity
             android:name=".NewRoomActivity"
             android:exported="true"
@@ -24,8 +28,7 @@
         <activity
             android:name=".ChatActivity"
             android:exported="true"
-            android:parentActivityName=".RoomActivity"/>
-
+            android:parentActivityName=".RoomActivity" />
         <activity android:name=".ManageProfileActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

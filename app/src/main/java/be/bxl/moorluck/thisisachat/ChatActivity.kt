@@ -2,8 +2,6 @@ package be.bxl.moorluck.thisisachat
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.ImageDecoder
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -22,8 +20,6 @@ import be.bxl.moorluck.thisisachat.models.Message
 import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -37,6 +33,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import java.time.LocalDate
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
@@ -44,6 +41,8 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         const val ROOM_NAME = "ROOM_NAME"
         const val ROOM_ID = "ROOM_ID"
         const val ROOM_TYPE = "ROOM_TYPE"
+
+        const val MESSAGES = "MESSAGES"
     }
 
     //Firebase
@@ -377,6 +376,9 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (roomType == FirebaseConst.CUSTOM) {
+            menuInflater.inflate(R.menu.chat_menu_action_bar_custom, menu)
+        }
+        else {
             menuInflater.inflate(R.menu.chat_menu_action_bar, menu)
         }
         return super.onCreateOptionsMenu(menu)
@@ -388,6 +390,12 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                 val intent = Intent(this, ManageRoomActivity::class.java)
                 intent.putExtra(ROOM_ID, roomId)
                 intent.putExtra(ROOM_TYPE, roomType)
+                startActivity(intent)
+            }
+
+            R.id.menu_search -> {
+                val intent = Intent(this, SearchMessageActivity::class.java)
+                intent.putParcelableArrayListExtra(MESSAGES, ArrayList(messages))
                 startActivity(intent)
             }
 

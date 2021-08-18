@@ -1,7 +1,10 @@
 package be.bxl.moorluck.thisisachat.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
+@Parcelize
 data class Message (
     val userId : String? = null,
     val pseudo : String? = null,
@@ -9,4 +12,4 @@ data class Message (
     val date : String? = null,
     val content : String? = null,
     val imgContent : String? = null
-)
+) : Parcelable

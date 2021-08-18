@@ -43,6 +43,7 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
         holder.tvRoomName.text = room.name
 
         if (room.lastMessage != null) {
+            holder.tvLastMessage.visibility = View.VISIBLE
             val lastMessage = if (room.lastMessage.content != null) {
                 room.lastMessage.pseudo.toString() +
                         " : " +
@@ -53,6 +54,9 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
                         " : img"
             }
             holder.tvLastMessage.text = lastMessage
+        }
+        else {
+            holder.tvLastMessage.visibility = View.INVISIBLE
         }
 
         if (room.type != FirebaseConst.PRIVATE) {
