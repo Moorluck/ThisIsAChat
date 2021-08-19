@@ -31,6 +31,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.util.*
 import kotlin.collections.ArrayList
@@ -152,6 +153,8 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         roomName = intent.getStringExtra(ROOM_NAME) ?: ""
         roomId = intent.getStringExtra(ROOM_ID) ?: ""
 
+        updateState()
+
         // OnClick
 
         btnSend.setOnClickListener {
@@ -164,6 +167,11 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
             getContent.launch(intent)
         }
 
+    }
+
+    private fun updateState() {
+        databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).child(FirebaseConst.ROOMS)
+            .child(roomId).setValue(true)
     }
 
     override fun onResume() {
@@ -252,6 +260,8 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                     }
                     chatAdapter.messages = messages
                     rvMessage.adapter = chatAdapter
+                    setStateOfRead(roomId, userFirebase!!.uid, true)
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -268,10 +278,30 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
             databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.LAST_MESSAGE)
                 .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), etMessage.text.toString()))
+                .addOnSuccessListener {
+                    setNewStateToRoom()
+                }
 
             // Clear ET
             etMessage.text.clear()
         }
+    }
+
+    private fun setNewStateToRoom() {
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.USERS).get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    it.children.forEach { user ->
+                        if (user.key != auth.currentUser!!.uid) {
+                            setStateOfRead(roomId, user.key!!, false)
+                        }
+                    }
+                }
+            }
+    }
+
+    private fun setStateOfRead(roomId: String, otherUserId: String, state : Boolean) {
+        databaseReference.child(FirebaseConst.USERS).child(otherUserId).child(FirebaseConst.ROOMS).child(roomId).setValue(state)
     }
 
     private fun uploadImage() {
@@ -295,6 +325,11 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
         databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.LAST_MESSAGE)
             .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), imgContent = imgUrl))
+            .addOnSuccessListener {
+                setNewStateToRoom()
+            }
+
+
     }
 
     private fun checkIfPrivateRoomExist(userId: String, otherUserId: String) {
@@ -356,8 +391,8 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
             databaseReference.child(FirebaseConst.USERS)
                 .child(auth.currentUser!!.uid)
                 .child(FirebaseConst.ROOMS)
-                .child(UUID.randomUUID().toString())
-                .setValue(room.id)
+                .child(room.id!!)
+                .setValue(false)
                 .addOnSuccessListener {
                     addRoomToOtherUser(room, otherUserId)
                 }
@@ -367,10 +402,10 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         databaseReference.child(FirebaseConst.USERS)
             .child(otherUserId)
             .child(FirebaseConst.ROOMS)
-            .child(UUID.randomUUID().toString())
-            .setValue(room.id)
+            .child(room.id!!)
+            .setValue(false)
             .addOnSuccessListener {
-                navigateToPrivateRoom(room.id!!, room.name!!)
+                navigateToPrivateRoom(room.id, room.name!!)
             }
     }
 
@@ -401,6 +436,7 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
 
             android.R.id.home -> {
                 onBackPressed()
+                finish()
                 return true
             }
         }

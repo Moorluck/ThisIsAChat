@@ -3,6 +3,7 @@ package be.bxl.moorluck.thisisachat.fragments
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -30,9 +31,10 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
-class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
+class RoomFragment : Fragment(), RoomAdapter.ItemClickListener, RoomAdapter.StateGetter {
 
     // Companion object
 
@@ -97,9 +99,9 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
         rvRegionRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         rvHobbyRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         rvCustomRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        roomRegionAdapter = RoomAdapter(requireContext(), this)
-        roomHobbyAdapter = RoomAdapter(requireContext(), this)
-        roomCustomAdapter = RoomAdapter(requireContext(), this)
+        roomRegionAdapter = RoomAdapter(requireContext(), this, this)
+        roomHobbyAdapter = RoomAdapter(requireContext(), this, this)
+        roomCustomAdapter = RoomAdapter(requireContext(), this, this)
 
 
         //Onclick
@@ -155,11 +157,12 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
                 val mapOfRoom : MutableMap<String, Room> = mutableMapOf()
 
                 roomList.children.forEach { room ->
-                    databaseReference.child(FirebaseConst.ROOMS).child(type).child(room.value.toString())
+                    databaseReference.child(FirebaseConst.ROOMS).child(type).child(room.key.toString())
                         .addValueEventListener(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 if (snapshot.exists()) {
-                                    mapOfRoom[snapshot.getValue(Room::class.java)!!.id!!] = snapshot.getValue(Room::class.java)!!
+                                    val roomItem = snapshot.getValue(Room::class.java)!!
+                                    mapOfRoom[roomItem.id!!] = roomItem
                                     roomAdapter.rooms = mapOfRoom.values.toList()
                                     rvRoom.adapter = roomAdapter
                                 }
@@ -234,5 +237,24 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener {
         intent.putExtra(ChatActivity.ROOM_TYPE, roomType)
         intent.putExtra(ChatActivity.ROOM_ID, roomId)
         startActivity(intent)
+    }
+
+    override fun getStateOfRead(roomId: String?, lambda: (state: Boolean) -> Unit) {
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS)
+            .child(roomId!!)
+            .addValueEventListener(object : ValueEventListener {
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        lambda.invoke(snapshot.value as Boolean)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+
+
     }
 }

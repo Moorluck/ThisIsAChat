@@ -32,7 +32,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import java.util.*
 
-class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapter.ItemClickListener {
+class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapter.ItemClickListener, PrivateAdapter.StateGetter {
 
     companion object {
         @JvmStatic
@@ -86,7 +86,7 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
 
         rvRoom = view.findViewById(R.id.rv_private_fragment)
         rvRoom.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        rvAdapter = PrivateAdapter(requireContext(), this)
+        rvAdapter = PrivateAdapter(requireContext(), this, this)
         rvRoom.adapter = rvAdapter
 
         // OnClick
@@ -200,10 +200,11 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
                 mapOfNames = mutableMapOf()
 
                 roomList.children.forEach { room ->
-                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(room.value.toString())
+                    databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PRIVATE).child(room.key.toString())
                         .addValueEventListener(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 if (snapshot.exists()) {
+
                                     val itemRoom = snapshot.getValue(Room::class.java)!!
 
                                     itemRoom.users.forEach { user ->
@@ -273,6 +274,25 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
         intent.putExtra(ChatActivity.ROOM_TYPE, roomType)
         intent.putExtra(ChatActivity.ROOM_ID, roomId)
         startActivity(intent)
+    }
+
+    override fun getStateOfRead(roomId: String?, lambda: (state: Boolean) -> Unit) {
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS)
+            .child(roomId!!)
+            .addValueEventListener(object : ValueEventListener {
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        lambda.invoke(snapshot.value as Boolean)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+
+
     }
 
 

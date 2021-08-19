@@ -49,4 +49,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/img_profile_item_private"
         app:layout_constraintTop_toBottomOf="@+id/tv_pseudo_item_private" />
+
+    <ImageView
+        android:id="@+id/img_unread_item_private"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/round_shape" />
 </androidx.constraintlayout.widget.ConstraintLayout>

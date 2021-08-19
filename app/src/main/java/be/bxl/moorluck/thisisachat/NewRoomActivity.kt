@@ -149,7 +149,7 @@ class NewRoomActivity : Activity() {
 
     private fun addRoomToUserInfo() {
         databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS)
-            .child(UUID.randomUUID().toString()).setValue(roomId)
+            .child(roomId).setValue(false)
             .addOnSuccessListener {
                 finish()
             }

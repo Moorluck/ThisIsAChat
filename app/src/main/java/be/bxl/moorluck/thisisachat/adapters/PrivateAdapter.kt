@@ -12,7 +12,8 @@ import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.bumptech.glide.Glide
 
-class PrivateAdapter(private val context : Context, private val itemClickListener : ItemClickListener) : RecyclerView.Adapter<PrivateAdapter.ViewHolder>() {
+class PrivateAdapter(private val context : Context, private val itemClickListener : ItemClickListener,
+                     private val stateGetter: StateGetter) : RecyclerView.Adapter<PrivateAdapter.ViewHolder>() {
 
     var rooms : List<Room> = listOf()
     var users : List<User> = listOf()
@@ -21,6 +22,7 @@ class PrivateAdapter(private val context : Context, private val itemClickListene
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val imgProfile : ImageView = itemView.findViewById(R.id.img_profile_item_private)
+        val imgState : ImageView = itemView.findViewById(R.id.img_unread_item_private)
         val tvPseudo : TextView = itemView.findViewById(R.id.tv_pseudo_item_private)
         val tvLastMessage : TextView = itemView.findViewById(R.id.tv_last_message_item_private)
     }
@@ -63,6 +65,15 @@ class PrivateAdapter(private val context : Context, private val itemClickListene
         holder.itemView.setOnClickListener {
             itemClickListener.onItemClickListener(room.name, room.type, room.id)
         }
+
+        stateGetter.getStateOfRead(room.id) {
+            if (it) {
+                holder.imgState.visibility = View.INVISIBLE
+            }
+            else {
+                holder.imgState.visibility = View.VISIBLE
+            }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -71,6 +82,10 @@ class PrivateAdapter(private val context : Context, private val itemClickListene
 
     interface ItemClickListener {
         fun onItemClickListener(roomName : String?, roomType : String?, roomId : String?)
+    }
+
+    interface StateGetter {
+        fun getStateOfRead(roomId: String?, lambda : (state : Boolean) -> Unit)
     }
 
 

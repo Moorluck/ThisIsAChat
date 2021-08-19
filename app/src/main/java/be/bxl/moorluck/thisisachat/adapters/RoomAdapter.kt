@@ -18,12 +18,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 
-class RoomAdapter(private val context : Context, private val itemClickListener : ItemClickListener) : RecyclerView.Adapter<RoomAdapter.ViewHolder>() {
+class RoomAdapter(private val context : Context, private val itemClickListener : ItemClickListener,
+                  private val stateGetter: StateGetter) : RecyclerView.Adapter<RoomAdapter.ViewHolder>() {
 
     var rooms : List<Room> = listOf()
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val imgRoom : ImageView = itemView.findViewById(R.id.img_background_item_room)
+        val imgState : ImageView = itemView.findViewById(R.id.img_unread_item_room)
         val tvRoomName : TextView = itemView.findViewById(R.id.tv_room_name_item_room)
         val tvLastMessage : TextView = itemView.findViewById(R.id.tv_last_message_item_room)
         val tvNumberOfUser : TextView = itemView.findViewById(R.id.tv_number_member_item_room)
@@ -55,6 +57,7 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
             }
             holder.tvLastMessage.text = lastMessage
         }
+
         else {
             holder.tvLastMessage.visibility = View.INVISIBLE
         }
@@ -87,6 +90,15 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
             itemClickListener.onItemClickListener(room.name, room.type, room.id)
         }
 
+        stateGetter.getStateOfRead(room.id) {
+            if (it) {
+                holder.imgState.visibility = View.INVISIBLE
+            }
+            else {
+                holder.imgState.visibility = View.VISIBLE
+            }
+        }
+
     }
 
     override fun getItemCount(): Int {
@@ -95,6 +107,10 @@ class RoomAdapter(private val context : Context, private val itemClickListener :
 
     interface ItemClickListener {
         fun onItemClickListener(roomName : String?, roomType : String?, roomId : String?)
+    }
+
+    interface StateGetter {
+        fun getStateOfRead(roomId: String?, lambda : (state : Boolean) -> Unit)
     }
 }
 

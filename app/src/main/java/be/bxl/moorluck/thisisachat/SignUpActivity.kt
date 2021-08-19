@@ -80,7 +80,7 @@ class SignUpActivity : AppCompatActivity() {
     private var _hobbyRooms : MutableList<String> = mutableListOf()
     private var _newPlaceRooms : MutableList<Room> = mutableListOf()
     private var _newHobbyRooms : MutableList<Room> = mutableListOf()
-    private var rooms : MutableMap<String, String> = mutableMapOf()
+    private var rooms : MutableMap<String, Boolean> = mutableMapOf()
 
     var country : String? = null
     var state : String? = null
@@ -323,7 +323,7 @@ class SignUpActivity : AppCompatActivity() {
                             if (index == _hobbyRooms.size - 1) {
 
                                 for (hobbyRoom in _hobbyRooms) {
-                                    rooms[UUID.randomUUID().toString()] = hobbyRoom
+                                    rooms[hobbyRoom] = false
                                 }
 
                                 lifecycleScope.launch(Dispatchers.Main) {
@@ -350,7 +350,7 @@ class SignUpActivity : AppCompatActivity() {
                                 if (index == _hobbyRooms.size - 1) {
 
                                     for (hobbyRoom in _hobbyRooms) {
-                                        rooms[UUID.randomUUID().toString()] = hobbyRoom
+                                        rooms[hobbyRoom] = false
                                     }
 
                                     generatePlacesRooms()
@@ -380,7 +380,7 @@ class SignUpActivity : AppCompatActivity() {
                         if (index == _placeRooms.size - 1) {
 
                             for (placeRoom in _placeRooms) {
-                                rooms[UUID.randomUUID().toString()] = placeRoom
+                                rooms[placeRoom] = false
                             }
 
                             lifecycleScope.launch(Dispatchers.Main) {
@@ -414,7 +414,7 @@ class SignUpActivity : AppCompatActivity() {
                         if (index == _placeRooms.size - 1) {
 
                             for (placeRoom in _placeRooms) {
-                                rooms[UUID.randomUUID().toString()] = placeRoom
+                                rooms[placeRoom] = false
                             }
 
                             addUserToDataBase()
