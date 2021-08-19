@@ -66,6 +66,8 @@ class ChatAdapter(val context : Context, private val userId : String,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
+        holder.setIsRecyclable(false)
+
         if (messages[position].content != null) {
             holder.tvChat.text = messages[position].content
         }
@@ -79,7 +81,7 @@ class ChatAdapter(val context : Context, private val userId : String,
         }
 
 
-        if (position == 0 || messages[position-1].userId != messages[position].userId) {
+        if (position == 0 || (messages[position-1].userId != messages[position].userId)) {
             Glide.with(context)
                 .asDrawable()
                 .load(messages[position].imgProfileRef)
@@ -105,5 +107,9 @@ class ChatAdapter(val context : Context, private val userId : String,
 
     override fun getItemCount(): Int {
         return messages.size
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
     }
 }

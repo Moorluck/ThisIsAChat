@@ -46,7 +46,7 @@ class NewRoomActivity : Activity() {
 
     // Uri
 
-    lateinit var uri : Uri
+    var uri : Uri? = null
 
     // User
 
@@ -86,12 +86,12 @@ class NewRoomActivity : Activity() {
         getUserInfo()
 
         btnCreate.setOnClickListener {
-            if (etName.text.toString().trim().isNotEmpty()) {
+            if (etName.text.toString().trim().isNotEmpty() && uri != null) {
                 btnCreate.isEnabled = false
                 uploadImg()
             }
             else {
-                Toast.makeText(this, "Your room must have a name", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Your room must have a name and a picture", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -114,7 +114,7 @@ class NewRoomActivity : Activity() {
         val fileName = UUID.randomUUID()
         val imageRef = storageReference.child("images/$fileName")
 
-        imageRef.putFile(uri)
+        imageRef.putFile(uri!!)
             .addOnSuccessListener {
                 imageRef.downloadUrl.addOnSuccessListener {
                     photoRef = it.toString()
@@ -161,7 +161,7 @@ class NewRoomActivity : Activity() {
         if (requestCode == REQUEST_CODE) {
             uri = data!!.data!!
             tvAddPicture.visibility = View.INVISIBLE
-            val source = ImageDecoder.createSource(contentResolver, uri)
+            val source = ImageDecoder.createSource(contentResolver, uri!!)
             val profileDrawable = ImageDecoder.decodeDrawable(source)
             imgRoom.setImageDrawable(profileDrawable)
             imgRoom.setBackgroundColor(Color.TRANSPARENT)

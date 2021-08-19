@@ -199,8 +199,8 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener, RoomAdapter.Stat
                     databaseReference.child(FirebaseConst.USERS)
                         .child(auth.currentUser!!.uid)
                         .child(FirebaseConst.ROOMS)
-                        .child(UUID.randomUUID().toString())
-                        .setValue(roomId)
+                        .child(roomId)
+                        .setValue(false)
                         .addOnSuccessListener {
                             joinARoom(roomId)
                         }
