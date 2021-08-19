@@ -146,6 +146,7 @@ class ManageProfileActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error while loading user : $it", Toast.LENGTH_LONG).show()
                 }
         }
+
     }
 
     private fun uploadImg() {
@@ -193,7 +194,7 @@ class ManageProfileActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { roomList ->
                 roomList.children.forEach {
-                    val roomId = it.value
+                    val roomId = it.key
 
                     if (roomId == getString(R.string.music)) {
                         cbMusic.isChecked = true

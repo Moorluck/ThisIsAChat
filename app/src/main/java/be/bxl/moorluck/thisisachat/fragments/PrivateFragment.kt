@@ -288,7 +288,6 @@ class PrivateFragment : Fragment(), RoomAdapter.ItemClickListener, PrivateAdapte
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
                 }
             })
 

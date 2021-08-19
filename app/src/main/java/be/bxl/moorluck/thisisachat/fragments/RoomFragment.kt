@@ -251,7 +251,7 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener, RoomAdapter.Stat
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
+
                 }
             })
 
