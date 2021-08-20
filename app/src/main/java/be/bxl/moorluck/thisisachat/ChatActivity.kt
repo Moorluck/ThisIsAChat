@@ -2,6 +2,8 @@ package be.bxl.moorluck.thisisachat
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,16 +12,21 @@ import android.view.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.bxl.moorluck.thisisachat.adapters.ChatAdapter
+import be.bxl.moorluck.thisisachat.api.RetrofitInstance
 import be.bxl.moorluck.thisisachat.api.Url
+import be.bxl.moorluck.thisisachat.api.models.Meme
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
 import be.bxl.moorluck.thisisachat.models.Grade
 import be.bxl.moorluck.thisisachat.models.Message
 import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -31,7 +38,9 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.time.LocalDate
 import java.util.*
 import kotlin.collections.ArrayList
@@ -167,7 +176,14 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
             getContent.launch(intent)
         }
 
+        imgSendImage.setOnLongClickListener {
+            getMeme()
+            return@setOnLongClickListener true
+        }
+
     }
+
+
 
     private fun updateState() {
         databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).child(FirebaseConst.ROOMS)
@@ -317,6 +333,30 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
                     }
                 }
         }
+    }
+
+    private fun getMeme() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            try {
+                val response = RetrofitInstance.apiMeme.getMeme()
+                Log.d("response", response.toString())
+                sendMeme(response)
+            }
+            catch (e : Exception) {
+                Toast.makeText(this@ChatActivity, "Error calling api : $e", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun sendMeme(response: Meme) {
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.MESSAGES).push()
+            .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), imgContent = response.url))
+
+        databaseReference.child(FirebaseConst.ROOMS).child(roomType).child(roomId).child(FirebaseConst.LAST_MESSAGE)
+            .setValue(Message(userFirebase!!.uid, user!!.pseudo, user!!.imgUrl!!, LocalDate.now().toString(), imgContent = response.url))
+            .addOnSuccessListener {
+                setNewStateToRoom()
+            }
     }
 
     private fun sendImage(imgUrl: String) {

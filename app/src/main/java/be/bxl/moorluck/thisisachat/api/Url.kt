@@ -8,6 +8,8 @@ class Url {
 
         const val BASE_URL_GEOCODING = "https://nominatim.openstreetmap.org/"
         const val BASE_URL_PLACE = "https://maps.googleapis.com/maps/api/place/textsearch/"
+        const val BASE_URL_MEME = "https://meme-api.herokuapp.com/"
+
         private const val BASE_URL_PLACE_PHOTO = "https://maps.googleapis.com/maps/api/place/photo?photoreference=__photoreference__&maxheight=__maxheight__&maxwidth=__maxwidth__&key=__key__"
 
         fun getPhotoUrl(photoReference : String, maxHeight : Int, maxWidth : Int, key : String) : String {

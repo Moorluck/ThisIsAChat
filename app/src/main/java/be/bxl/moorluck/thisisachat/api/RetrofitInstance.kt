@@ -24,11 +24,22 @@ object RetrofitInstance {
             .build()
     }
 
+    private val retrofitMeme by lazy {
+        Retrofit.Builder()
+            .baseUrl(Url.BASE_URL_MEME)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+    }
+
     val apiGeocoding: NominatimApi by lazy {
         retrofitGeocoding.create(NominatimApi::class.java)
     }
 
     val apiPlace: PlacesApi by lazy {
         retrofitPlace.create(PlacesApi::class.java)
+    }
+
+    val apiMeme : MemeApi by lazy {
+        retrofitMeme.create(MemeApi::class.java)
     }
 }
