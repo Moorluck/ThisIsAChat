@@ -165,10 +165,13 @@
             android:id="@+id/tv_id_manage_profile_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:textColor="@color/grey"
             android:textIsSelectable="true"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/img_copy_manage_profile_activity"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/img_profile_manage_profile_activity" />
 
@@ -179,6 +182,8 @@
             android:layout_marginStart="8dp"
             android:tint="@color/lightPurple"
             app:layout_constraintBottom_toBottomOf="@+id/tv_id_manage_profile_activity"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/tv_id_manage_profile_activity"
             app:layout_constraintTop_toTopOf="@+id/tv_id_manage_profile_activity"
             app:srcCompat="@drawable/ic_baseline_content_copy_24" />

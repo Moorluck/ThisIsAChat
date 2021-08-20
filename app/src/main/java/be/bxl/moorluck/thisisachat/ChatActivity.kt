@@ -339,7 +339,6 @@ class ChatActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         lifecycleScope.launch(Dispatchers.Main) {
             try {
                 val response = RetrofitInstance.apiMeme.getMeme()
-                Log.d("response", response.toString())
                 sendMeme(response)
             }
             catch (e : Exception) {

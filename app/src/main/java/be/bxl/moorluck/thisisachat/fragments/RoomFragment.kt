@@ -117,7 +117,7 @@ class RoomFragment : Fragment(), RoomAdapter.ItemClickListener, RoomAdapter.Stat
             val view = dialogInflater.inflate(R.layout.dialog_join_room, null)
 
             val viewDialog = builder.setView(view)
-                .setPositiveButton("Join") { dialog, _ ->
+                .setPositiveButton("Join") { _, _ ->
                     val etRoomId : EditText = view.findViewById(R.id.et_room_id_join_dialog)
                     addRoomToUser(etRoomId.text.toString())
                 }
