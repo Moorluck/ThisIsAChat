@@ -94,9 +94,12 @@ class SearchMessageActivity : Activity(), PopupMenu.OnMenuItemClickListener {
         btnSearch.setOnClickListener {
             val messagesFiltered : MutableList<Message> = mutableListOf()
             for (message in messages) {
-                if (message.content!!.contains(etSearch.text.toString())) {
-                    messagesFiltered.add(message)
+                if (message.content != null) {
+                    if (message.content.contains(etSearch.text.toString())) {
+                        messagesFiltered.add(message)
+                    }
                 }
+
             }
             chatAdapter.messages = messagesFiltered
             rvMessage.adapter = chatAdapter

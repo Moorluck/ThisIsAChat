@@ -46,6 +46,7 @@ class ManageRoomActivity : AppCompatActivity() {
     private lateinit var imgRoom : ImageView
 
     lateinit var btnModify : Button
+    lateinit var btnLeaveRoom : Button
 
     // Room info
 
@@ -93,6 +94,7 @@ class ManageRoomActivity : AppCompatActivity() {
         imgRoom = findViewById(R.id.img_room_manage_room_activity)
 
         btnModify = findViewById(R.id.btn_modify_manage_room_activity)
+        btnLeaveRoom = findViewById(R.id.btn_leave_room_manage_profile_activity)
 
         // Setup the action bar
 
@@ -124,6 +126,31 @@ class ManageRoomActivity : AppCompatActivity() {
             uploadImg()
         }
 
+        btnLeaveRoom.setOnClickListener {
+            removeRoomFromUser()
+        }
+
+    }
+
+    private fun removeRoomFromUser() {
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS)
+            .child(room.id!!)
+            .removeValue()
+            .addOnSuccessListener {
+                removeUserFromRoom()
+            }
+    }
+
+    private fun removeUserFromRoom() {
+        databaseReference.child(FirebaseConst.ROOMS).child(room.type!!).child(room.id!!)
+            .child(FirebaseConst.USERS).child(auth.currentUser!!.uid)
+            .removeValue()
+            .addOnSuccessListener {
+                val intent = Intent(this, RoomActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+                finish()
+            }
     }
 
     private fun uploadImg() {

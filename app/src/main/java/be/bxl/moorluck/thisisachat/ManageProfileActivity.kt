@@ -1,16 +1,18 @@
 package be.bxl.moorluck.thisisachat
 
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.ImageDecoder
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
+import be.bxl.moorluck.thisisachat.models.Grade
 import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.bumptech.glide.Glide
@@ -22,6 +24,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 class ManageProfileActivity : AppCompatActivity() {
@@ -35,6 +38,7 @@ class ManageProfileActivity : AppCompatActivity() {
     // View
     private lateinit var tvId : TextView
     private lateinit var etPseudo : EditText
+
     private lateinit var cbMusic : CheckBox
     private lateinit var cbTravelling : CheckBox
     private lateinit var cbPhotography : CheckBox
@@ -43,9 +47,12 @@ class ManageProfileActivity : AppCompatActivity() {
     private lateinit var cbVideoGames : CheckBox
     private lateinit var cbCooking : CheckBox
     private lateinit var cbSport : CheckBox
+
+    private var listOfCb : MutableList<CheckBox> = mutableListOf()
     private lateinit var btnModify : Button
     private lateinit var btnSignOut : Button
     private lateinit var imgProfile : ImageView
+    private lateinit var imgCopy : ImageView
 
     // User
 
@@ -100,10 +107,14 @@ class ManageProfileActivity : AppCompatActivity() {
         cbCooking = findViewById(R.id.cb_cooking_manage_profile_activity)
         cbSport = findViewById(R.id.cb_sport_manage_profile_activity)
 
+        listOfCb.addAll(listOf(cbMusic, cbTravelling, cbPhotography, cbDrawing, cbScience,
+            cbVideoGames, cbCooking, cbSport))
+
         btnModify = findViewById(R.id.btn_modify_manage_profile_activity)
         btnSignOut = findViewById(R.id.btn_sign_out_maage_profile_activity)
 
         imgProfile = findViewById(R.id.img_profile_manage_profile_activity)
+        imgCopy = findViewById(R.id.img_copy_manage_profile_activity)
 
         // Set up id
 
@@ -129,6 +140,13 @@ class ManageProfileActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
+        }
+
+        imgCopy.setOnClickListener {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText(ManageRoomActivity.LABEL_COPY, auth.currentUser!!.uid)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(this, "User ID successfully copied !", Toast.LENGTH_LONG).show()
         }
 
         // Action bar title
@@ -181,12 +199,110 @@ class ManageProfileActivity : AppCompatActivity() {
             databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.IMG_URL)
                 .setValue(imgUrl)
                 .addOnSuccessListener {
-                    finish()
+                    updateHobbyRoom()
                 }
         }
         else {
-            finish()
+            updateHobbyRoom()
         }
+    }
+
+    private fun updateHobbyRoom() {
+        runBlocking {
+            for (cb in listOfCb) {
+                if (cb.isChecked) {
+                    checkIfUserAlreadyJoinTheRoom(cb.text.toString())
+                }
+                else {
+                    checkIfUserWantToRemoveTheRoom(cb.text.toString())
+                }
+            }
+        }
+
+        finish()
+
+    }
+
+    private fun checkIfUserWantToRemoveTheRoom(cbText: String) {
+        databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).child(FirebaseConst.ROOMS)
+            .child(cbText)
+            .get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    removeRoomFromUser(cbText)
+                }
+            }
+    }
+
+    private fun removeRoomFromUser(cbText: String) {
+        databaseReference.child(FirebaseConst.USERS).child(userFirebase!!.uid).child(FirebaseConst.ROOMS)
+            .child(cbText)
+            .removeValue()
+            .addOnSuccessListener {
+                removeUserFromRoom(cbText)
+            }
+    }
+
+    private fun removeUserFromRoom(cbText: String) {
+        databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(cbText)
+            .child(FirebaseConst.USERS).child(userFirebase!!.uid)
+            .removeValue()
+    }
+
+    private fun checkIfUserAlreadyJoinTheRoom(cbText: String) {
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid)
+            .child(FirebaseConst.ROOMS).child(cbText).get()
+            .addOnSuccessListener {
+                if (!it.exists()) {
+                    addRoomToUser(cbText)
+                }
+            }
+    }
+
+    private fun addRoomToUser(cbText: String) {
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid)
+            .child(FirebaseConst.ROOMS).child(cbText).setValue(false)
+            .addOnSuccessListener {
+                checkIfRoomExist(cbText)
+            }
+    }
+
+    private fun checkIfRoomExist(cbText: String) {
+        databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(cbText)
+            .get()
+            .addOnSuccessListener {
+                if (!it.exists()) {
+                    createNewHobbyRoom(cbText)
+                }
+
+                else {
+                    addUserToRoom(cbText)
+                }
+            }
+    }
+
+    private fun addUserToRoom(cbText: String) {
+        databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(cbText)
+            .child(FirebaseConst.USERS)
+            .child(userFirebase!!.uid)
+            .setValue(user!!.pseudo)
+    }
+
+    private fun createNewHobbyRoom(cbText: String) {
+
+        val newMapOfUser = mapOf(userFirebase!!.uid to user!!.pseudo!!)
+        val newMapOfGrade = mapOf(Grade().name to Grade(users = mapOf(userFirebase!!.uid to user!!.pseudo!!)))
+
+        val newRoom = Room(type = FirebaseConst.HOBBY,
+                        id = cbText,
+                        name = cbText,
+                        users = newMapOfUser,
+                        photoRef = "https://firebasestorage.googleapis.com/v0/b/thisisachat-b0f70.appspot.com/o/images%2Fhobby.jpg?alt=media&token=08b97907-2d3a-43c4-a200-d0d821e9dfab",
+                        grades = newMapOfGrade
+        )
+
+        databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(cbText)
+            .setValue(newRoom)
     }
 
     private fun setupCheckBoxes() {
@@ -196,37 +312,12 @@ class ManageProfileActivity : AppCompatActivity() {
                 roomList.children.forEach {
                     val roomId = it.key
 
-                    if (roomId == getString(R.string.music)) {
-                        cbMusic.isChecked = true
+                    for (cb in listOfCb) {
+                        if (roomId == cb.text.toString()) {
+                            cb.isChecked = true
+                        }
                     }
 
-                    if (roomId == getString(R.string.travelling)) {
-                        cbTravelling.isChecked = true
-                    }
-
-                    if (roomId == getString(R.string.photography)) {
-                        cbPhotography.isChecked = true
-                    }
-
-                    if (roomId == getString(R.string.drawing)) {
-                        cbDrawing.isChecked = true
-                    }
-
-                    if (roomId == getString(R.string.science)) {
-                        cbScience.isChecked = true
-                    }
-
-                    if (roomId == getString(R.string.video_games)) {
-                        cbVideoGames.isChecked = true
-                    }
-
-                    if (roomId == getString(R.string.cooking)) {
-                        cbCooking.isChecked = true
-                    }
-
-                    if (roomId == getString(R.string.sports)) {
-                        cbSport.isChecked = true
-                    }
                 }
             }
     }
