@@ -93,7 +93,7 @@
             android:layout_height="30dp"
             android:layout_marginStart="8dp"
             android:background="@drawable/btn_shape"
-            android:text="Join a new room"
+            android:text="@string/join_a_new_room"
             android:textColor="@color/lightPurple"
             android:textSize="9sp"
             app:layout_constraintStart_toEndOf="@+id/btn_new_room_room_fragment"

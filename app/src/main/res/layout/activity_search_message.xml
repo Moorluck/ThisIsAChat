@@ -21,7 +21,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:ems="10"
-            android:hint="Search text in chat"
+            android:hint="@string/search_text_in_chat"
             android:textColor="@color/black"
             android:background="@drawable/et_shape"
             android:padding="5dp"

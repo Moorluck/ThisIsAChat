@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_room"
-        android:title="Rooms"
+        android:title="@string/rooms"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_people_24"
         />
 
     <item android:id="@+id/menu_private"
-        android:title="Private"
+        android:title="@string/private_message"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_chat_bubble_24"
         />

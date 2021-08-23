@@ -1,22 +1,22 @@
 <resources>
     <string name="app_name">ThisIsAChat</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="enter_a_message">Enter a message</string>
     <string name="send">Send</string>
     <string name="password">Password</string>
-    <string name="e_mail">E-mail</string>
+    <string name="e_mail" translatable="false">E-mail</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="modify">Modify</string>
-    <string name="pseudo">Pseudo</string>
+    <string name="pseudo" translatable="false">Pseudo</string>
     <string name="select_some_of_your_hobbies">Select some of your hobbies :</string>
     <string name="drawing">Drawing</string>
     <string name="music">Music</string>
     <string name="photography">Photography</string>
     <string name="video_games">Video games</string>
-    <string name="science">Science</string>
+    <string name="science" translatable="false">Science</string>
     <string name="travelling">Travelling</string>
-    <string name="sports">Sports</string>
+    <string name="sports" translatable="false">Sports</string>
     <string name="sign_out">Sign out</string>
     <string name="cooking">Cooking</string>
     <string name="add_a_picture">Add a picture</string>
@@ -24,4 +24,14 @@
     <string name="rooms_by_hobby">Rooms by hobby</string>
     <string name="custom_rooms">Custom rooms</string>
     <string name="create_a_new_room">Create a new room</string>
+    <string name="room_id" translatable="false">Room Id :</string>
+    <string name="name">Name</string>
+    <string name="leave_room">Leave Room</string>
+    <string name="create">Create</string>
+    <string name="search_text_in_chat">Search text in chat</string>
+    <string name="enter_room_id">Enter room id :</string>
+    <string name="enter_a_user_id">Enter a user ID</string>
+    <string name="join_a_new_room">Join a new room</string>
+    <string name="private_message">Private</string>
+    <string name="rooms">Rooms</string>
 </resources>

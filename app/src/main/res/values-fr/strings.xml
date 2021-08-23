@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ThisIsAChat</string>
+    <string name="enter_a_message">Entrez un message</string>
+    <string name="send">Envoyer</string>
+    <string name="password">Mot de passe</string>
+    <string name="sign_in">S\'enregistrer</string>
+    <string name="sign_up">S\'inscrire</string>
+    <string name="modify">Modifier</string>
+    <string name="select_some_of_your_hobbies">Sélectionner vos hobbies</string>
+    <string name="drawing">Dessin</string>
+    <string name="music">Musique</string>
+    <string name="photography">Photographie</string>
+    <string name="video_games">Jeux vidéo</string>
+    <string name="travelling">Voyage</string>
+    <string name="sign_out">Se déconnecter</string>
+    <string name="cooking">Cuisine</string>
+    <string name="add_a_picture">Ajouter une photo</string>
+    <string name="rooms_by_region">Rooms par région</string>
+    <string name="rooms_by_hobby">Rooms par hobby</string>
+    <string name="custom_rooms">Rooms custom</string>
+    <string name="create_a_new_room">Créer une nouvelle room</string>
+    <string name="name">Nom</string>
+    <string name="leave_room">Quitter la room</string>
+    <string name="create">Créer</string>
+    <string name="search_text_in_chat">Chercher dans le chat</string>
+    <string name="enter_room_id">Entrer l\'id de la room</string>
+    <string name="enter_a_user_id">Entrer l\'id de l\'utilisateur</string>
+    <string name="join_a_new_room">Rejoindre une nouvelle room</string>
+    <string name="private_message">Privé</string>
+</resources>

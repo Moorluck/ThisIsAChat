@@ -71,7 +71,7 @@
             android:id="@+id/cb_cooking_manage_profile_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cooking"
+            android:text="@string/cooking"
             android:textColor="@color/lightPurple"
             app:layout_constraintStart_toStartOf="@+id/cb_video_games_manage_profile_activity"
             app:layout_constraintTop_toBottomOf="@+id/cb_video_games_manage_profile_activity" />
@@ -180,13 +180,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:tint="@color/lightPurple"
             app:layout_constraintBottom_toBottomOf="@+id/tv_id_manage_profile_activity"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/tv_id_manage_profile_activity"
             app:layout_constraintTop_toTopOf="@+id/tv_id_manage_profile_activity"
-            app:srcCompat="@drawable/ic_baseline_content_copy_24" />
+            app:srcCompat="@drawable/ic_baseline_content_copy_24"
+            app:tint="@color/lightPurple" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
