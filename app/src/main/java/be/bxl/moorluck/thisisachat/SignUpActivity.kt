@@ -240,7 +240,7 @@ class SignUpActivity : AppCompatActivity() {
             _hobbyRooms.add(cbSport.text.toString())
         }
 
-        uploadImg()
+        registerUser()
     }
 
     // Upload the image
@@ -255,7 +255,7 @@ class SignUpActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     imageRef.downloadUrl.addOnSuccessListener {
                         imgUrl = it.toString()
-                        registerUser()
+                        generateHobbyRooms()
                     }
                 }
                 .addOnFailureListener {
@@ -275,7 +275,7 @@ class SignUpActivity : AppCompatActivity() {
                     userId = it.result?.user!!.uid
                     auth.signInWithEmailAndPassword(email, password)
                         .addOnSuccessListener {
-                            generateHobbyRooms()
+                            uploadImg()
                         }
                         .addOnFailureListener {
                             Log.d("ERROR", "Unable to sign in")
@@ -323,7 +323,7 @@ class SignUpActivity : AppCompatActivity() {
                             if (index == _hobbyRooms.size - 1) {
 
                                 for (hobbyRoom in _hobbyRooms) {
-                                    rooms[hobbyRoom] = false
+                                    rooms[hobbyRoom] = true
                                 }
 
                                 lifecycleScope.launch(Dispatchers.Main) {
@@ -350,7 +350,7 @@ class SignUpActivity : AppCompatActivity() {
                                 if (index == _hobbyRooms.size - 1) {
 
                                     for (hobbyRoom in _hobbyRooms) {
-                                        rooms[hobbyRoom] = false
+                                        rooms[hobbyRoom] = true
                                     }
 
                                     generatePlacesRooms()
@@ -380,7 +380,7 @@ class SignUpActivity : AppCompatActivity() {
                         if (index == _placeRooms.size - 1) {
 
                             for (placeRoom in _placeRooms) {
-                                rooms[placeRoom] = false
+                                rooms[placeRoom] = true
                             }
 
                             lifecycleScope.launch(Dispatchers.Main) {
@@ -414,7 +414,7 @@ class SignUpActivity : AppCompatActivity() {
                         if (index == _placeRooms.size - 1) {
 
                             for (placeRoom in _placeRooms) {
-                                rooms[placeRoom] = false
+                                rooms[placeRoom] = true
                             }
 
                             addUserToDataBase()

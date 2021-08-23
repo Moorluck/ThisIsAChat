@@ -223,7 +223,6 @@ class ManageProfileActivity : AppCompatActivity() {
             ?: response.address.village?.replace("/", "-")
             ?: response.address.town?.replace("/", "-")
 
-        Log.d("place", country + state + city)
 
         if (country != null) {
             getPlaceRoom(country)
@@ -260,7 +259,7 @@ class ManageProfileActivity : AppCompatActivity() {
                             )
 
                             databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS)
-                                .child(place).setValue(false)
+                                .child(place).setValue(true)
 
 
                         }
@@ -277,13 +276,12 @@ class ManageProfileActivity : AppCompatActivity() {
 
                 else {
                     databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS)
-                        .child(place).setValue(false)
+                        .child(place).setValue(true)
                 }
             }
     }
 
     private fun createNewPlaceRoom(room: Room) {
-        Log.d("heelo", "hello")
         databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PLACE).child(room.id!!)
             .setValue(room)
     }
@@ -382,7 +380,7 @@ class ManageProfileActivity : AppCompatActivity() {
 
     private fun addRoomToUser(cbText: String) {
         databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid)
-            .child(FirebaseConst.ROOMS).child(cbText).setValue(false)
+            .child(FirebaseConst.ROOMS).child(cbText).setValue(true)
             .addOnSuccessListener {
                 checkIfRoomExist(cbText)
             }
