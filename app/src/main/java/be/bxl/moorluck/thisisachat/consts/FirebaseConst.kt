@@ -7,6 +7,7 @@ class FirebaseConst {
         const val PSEUDO = "pseudo"
         const val IMG_URL = "imgUrl"
         const val NAME = "name"
+        const val POSITION = "position"
         const val PLACE = "place"
         const val HOBBY = "hobby"
         const val CUSTOM = "custom"

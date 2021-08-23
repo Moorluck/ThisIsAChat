@@ -9,10 +9,17 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
+import be.bxl.moorluck.thisisachat.api.RetrofitInstance
+import be.bxl.moorluck.thisisachat.api.Url
+import be.bxl.moorluck.thisisachat.api.models.Place
 import be.bxl.moorluck.thisisachat.consts.FirebaseConst
+import be.bxl.moorluck.thisisachat.helpers.LocationHelper
 import be.bxl.moorluck.thisisachat.models.Grade
+import be.bxl.moorluck.thisisachat.models.Position
 import be.bxl.moorluck.thisisachat.models.Room
 import be.bxl.moorluck.thisisachat.models.User
 import com.bumptech.glide.Glide
@@ -24,7 +31,10 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.lang.Exception
 import java.util.*
 
 class ManageProfileActivity : AppCompatActivity() {
@@ -53,6 +63,7 @@ class ManageProfileActivity : AppCompatActivity() {
     private lateinit var btnSignOut : Button
     private lateinit var imgProfile : ImageView
     private lateinit var imgCopy : ImageView
+    private lateinit var imgUpdateLocation : ImageView
 
     // User
 
@@ -115,6 +126,7 @@ class ManageProfileActivity : AppCompatActivity() {
 
         imgProfile = findViewById(R.id.img_profile_manage_profile_activity)
         imgCopy = findViewById(R.id.img_copy_manage_profile_activity)
+        imgUpdateLocation = findViewById(R.id.img_update_location_manage_profile_activity)
 
         // Set up id
 
@@ -149,6 +161,10 @@ class ManageProfileActivity : AppCompatActivity() {
             Toast.makeText(this, "User ID successfully copied !", Toast.LENGTH_LONG).show()
         }
 
+        imgUpdateLocation.setOnClickListener {
+            updateLocation()
+        }
+
         // Action bar title
 
         supportActionBar?.title = "Manage Profile"
@@ -165,6 +181,111 @@ class ManageProfileActivity : AppCompatActivity() {
                 }
         }
 
+    }
+
+    private fun updateLocation() {
+        val locationHelper = LocationHelper(this) { pos ->
+            updateLatLong(pos)
+        }
+        locationHelper.getLastLocation()
+    }
+
+    private fun updateLatLong(pos: Position) {
+        databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.POSITION).setValue(pos)
+            .addOnSuccessListener {
+                executeCallToGetPlace(pos)
+            }
+    }
+
+    private fun executeCallToGetPlace(pos: Position) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            try {
+                val response = RetrofitInstance.apiGeocoding.getPlace(
+                    pos.lat,
+                    pos.long
+                )
+                getRoomByPlaces(response)
+            }
+            catch (e: Exception) {
+                Toast.makeText(this@ManageProfileActivity, "Error calling api : $e", Toast.LENGTH_LONG).show()
+            }
+
+        }
+    }
+
+    private fun getRoomByPlaces(response: Place) {
+
+        val country = response.address.country?.replace("/", "-")
+        val state = response.address.state?.replace("/", "-")
+            ?: response.address.region?.replace("/", "-")
+            ?: response.address.county?.replace("/", "-")
+        val city = response.address.city?.replace("/", "-")
+            ?: response.address.village?.replace("/", "-")
+            ?: response.address.town?.replace("/", "-")
+
+        Log.d("place", country + state + city)
+
+        if (country != null) {
+            getPlaceRoom(country)
+        }
+        if (state != null) {
+            getPlaceRoom(state)
+        }
+        if (city != null) {
+            getPlaceRoom(city)
+        }
+    }
+
+    private fun getPlaceRoom(place: String) {
+        databaseReference.child(FirebaseConst.USERS).child(FirebaseConst.ROOMS).child(place).get()
+            .addOnSuccessListener {
+                if (!it.exists()) {
+                    runBlocking {
+                        generateRoom(place)
+                    }
+                }
+            }
+    }
+
+    private fun generateRoom(place: String) {
+        databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PLACE).child(place).get()
+            .addOnSuccessListener {
+                if (!it.exists()) {
+                    runBlocking {
+                        try {
+                            val result = RetrofitInstance.apiPlace.getPlacesDetail(place, Url.getApiKey(this@ManageProfileActivity))
+
+                            createNewPlaceRoom(
+                                Room(name = place, id = place, photoRef = result.results[0].photos[0].photo_reference, type = "place")
+                            )
+
+                            databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS)
+                                .child(place).setValue(false)
+
+
+                        }
+                        catch(e : Exception)  {
+
+                            createNewPlaceRoom(
+                                Room(name = place, id = place, photoRef = "", type = "place")
+                            )
+
+                            Toast.makeText(this@ManageProfileActivity, "Error while loading place photo : $e", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+
+                else {
+                    databaseReference.child(FirebaseConst.USERS).child(auth.currentUser!!.uid).child(FirebaseConst.ROOMS)
+                        .child(place).setValue(false)
+                }
+            }
+    }
+
+    private fun createNewPlaceRoom(room: Room) {
+        Log.d("heelo", "hello")
+        databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.PLACE).child(room.id!!)
+            .setValue(room)
     }
 
     private fun uploadImg() {
@@ -276,13 +397,13 @@ class ManageProfileActivity : AppCompatActivity() {
                 }
 
                 else {
-                    addUserToRoom(cbText)
+                    addUserToRoom(cbText, FirebaseConst.HOBBY)
                 }
             }
     }
 
-    private fun addUserToRoom(cbText: String) {
-        databaseReference.child(FirebaseConst.ROOMS).child(FirebaseConst.HOBBY).child(cbText)
+    private fun addUserToRoom(cbText: String, type : String) {
+        databaseReference.child(FirebaseConst.ROOMS).child(type).child(cbText)
             .child(FirebaseConst.USERS)
             .child(userFirebase!!.uid)
             .setValue(user!!.pseudo)
