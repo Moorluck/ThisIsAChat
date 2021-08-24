@@ -16,16 +16,17 @@
     <string name="sign_out">Se déconnecter</string>
     <string name="cooking">Cuisine</string>
     <string name="add_a_picture">Ajouter une photo</string>
-    <string name="rooms_by_region">Rooms par région</string>
-    <string name="rooms_by_hobby">Rooms par hobby</string>
-    <string name="custom_rooms">Rooms custom</string>
-    <string name="create_a_new_room">Créer une nouvelle room</string>
+    <string name="rooms_by_region">Salons par région</string>
+    <string name="rooms_by_hobby">Salons par hobby</string>
+    <string name="custom_rooms">Salons custom</string>
+    <string name="create_a_new_room">Créer un nouveau salon</string>
     <string name="name">Nom</string>
-    <string name="leave_room">Quitter la room</string>
+    <string name="leave_room">Quitter le salon</string>
     <string name="create">Créer</string>
     <string name="search_text_in_chat">Chercher dans le chat</string>
-    <string name="enter_room_id">Entrer l\'id de la room</string>
+    <string name="enter_room_id">Entrer l\'id du salon</string>
     <string name="enter_a_user_id">Entrer l\'id de l\'utilisateur</string>
-    <string name="join_a_new_room">Rejoindre une nouvelle room</string>
+    <string name="join_a_new_room">Rejoindre un nouveau salon</string>
     <string name="private_message">Privé</string>
+    <string name="rooms">Salons</string>
 </resources>

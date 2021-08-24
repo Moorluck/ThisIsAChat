@@ -143,7 +143,7 @@ class SignUpActivity : AppCompatActivity() {
             password = etPassword.text.toString()
             pseudo = etPseudo.text.toString()
 
-            if (email.trim() != "" && password.trim() != "" && pseudo.trim() != "") {
+            if (email.trim() != "" && password.trim() != "" && pseudo.trim() != "" && uri != null) {
                 // Get position then create or join the rooms
                 val locationHelper = LocationHelper(this) { pos ->
                     btnSignUp.isEnabled = false
@@ -243,6 +243,32 @@ class SignUpActivity : AppCompatActivity() {
         registerUser()
     }
 
+    // Register the user
+
+    private fun registerUser() {
+
+        // Signing up user
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { it ->
+                if (it.isSuccessful) {
+                    userId = it.result?.user!!.uid
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnSuccessListener {
+                            uploadImg()
+                        }
+                        .addOnFailureListener {
+                            Log.d("ERROR", "Unable to sign in")
+                        }
+                }
+                else {
+                    Toast.makeText(this, "Error while signing up ${it.exception}", Toast.LENGTH_LONG).show()
+                    _hobbyRooms.clear()
+                    _placeRooms.clear()
+                    btnSignUp.isEnabled = true
+                }
+            }
+    }
+
     // Upload the image
 
     private fun uploadImg() {
@@ -264,29 +290,7 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    // Register the user
 
-    private fun registerUser() {
-
-        // Signing up user
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { it ->
-                if (it.isSuccessful) {
-                    userId = it.result?.user!!.uid
-                    auth.signInWithEmailAndPassword(email, password)
-                        .addOnSuccessListener {
-                            uploadImg()
-                        }
-                        .addOnFailureListener {
-                            Log.d("ERROR", "Unable to sign in")
-                        }
-                }
-                else {
-                    Toast.makeText(this, "Error while signing up ${it.exception}", Toast.LENGTH_LONG).show()
-                    btnSignUp.isEnabled = true
-                }
-        }
-    }
 
     // Add a user when the room already exist
 
